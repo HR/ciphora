@@ -8,6 +8,7 @@ import ImportPGPModal from './ImportPGPModal'
 import CreatePGPModal from './CreatePGPModal'
 import AddModal from './AddModal'
 import { useNotifications } from '../lib/notifications'
+import { clone, friendlyError } from '../lib/util'
 import { COMPOSE_CHAT_ID } from '../../consts'
 import { ipcRenderer } from 'electron'
 import '../../../static/css/*.css'
@@ -21,7 +22,6 @@ const initModalsState = {
   setupIdentity: false,
   importPGP: false,
   createPGP: false,
-  add: false,
   chatInfo: false,
   modalMessage: {
     text: '',
@@ -34,17 +34,6 @@ const CIPHORA_ID_REGEX = /^[0-9a-fA-F]{40}$/
 const WORDS_REGEX = /\S/
 const PUBLIC_KEY_REGEX = /-----BEGIN PGP PUBLIC KEY BLOCK-----(.|\n|\r|\r\n)+-----END PGP PUBLIC KEY BLOCK-----/
 const PRIVATE_KEY_REGEX = /-----BEGIN PGP PRIVATE KEY BLOCK-----(.|\n|\r|\r\n)+-----END PGP PRIVATE KEY BLOCK-----/m
-// Makes PGP error messages user friendly
-function friendlyError (error) {
-  return error.message.slice(
-    error.message.lastIndexOf('Error'),
-    error.message.length
-  )
-}
-// Makes a deep clone of an object
-function clone (obj) {
-  return JSON.parse(JSON.stringify(obj))
-}
 
 export default class App extends React.Component {
   static contextType = useNotifications(true)
@@ -64,22 +53,24 @@ export default class App extends React.Component {
     this.addChatHandler = this.composeChatHandler.bind(this)
     this.deleteChatHandler = this.deleteChatHandler.bind(this)
     this.activateChat = this.activateChat.bind(this)
-    this.sendMessage = this.sendMessage.bind(this)
+    this.sendMessage = this.composeMessage.bind(this)
     this.updateChats = this.updateChats.bind(this)
     this.handleModalError = this.handleModalError.bind(this)
     this.copyPGPHandler = this.copyPGPHandler.bind(this)
     this.createComposeChat = this.createComposeChat.bind(this)
     this.deleteNewChat = this.deleteComposeChat.bind(this)
-  }
 
-  componentDidMount () {
-    // Init notifications via the context
-    notifications = this.context
     // Add event listeners
     ipcRenderer.on('log', (event, data) => console.log(data))
     ipcRenderer.on('open-modal', (event, modal) => this.openModal(modal))
     ipcRenderer.on('update-chats', this.updateChats)
     ipcRenderer.on('modal-error', this.handleModalError)
+  }
+
+  componentDidMount () {
+    // Init notifications via the context
+    notifications = this.context
+    ipcRenderer.on('notify', (event, ...args) => notifications.show(...args))
   }
 
   updateChats (event, chats, activeChatId, closeModal) {
@@ -201,28 +192,19 @@ export default class App extends React.Component {
   }
 
   composeChatHandler (id) {
-    let ciphoraId = id.match(CIPHORA_ID_REGEX)
-    let pubKey = id.match(PUBLIC_KEY_REGEX)
+    let [ciphoraId] = id.match(CIPHORA_ID_REGEX)
+    let [publicKey] = id.match(PUBLIC_KEY_REGEX)
+    console.log('Got', ciphoraId, publicKey)
 
     // Ensure id is either a valid CiphoraId or PGP public key
-    if (!ciphoraId && !pubKey) {
-      this.setState({
-        modalMessage: {
-          text: 'Invalid CiphoraId or PGP key',
-          error: true
-        }
-      })
+    if (!ciphoraId && !publicKey) {
+      notifications.show('Invalid CiphoraId or PGP key', 'error', true, 2000)
       return
     }
 
-    this.setState({
-      modalMessage: {
-        text: 'Composing chat...',
-        error: false
-      }
-    })
+    notifications.show('Composing chat...', null, false)
 
-    ipcRenderer.send('add-chat', pubKey[0])
+    // ipcRenderer.send('add-chat', pubKey[0])
   }
 
   // Deletes the chat being composed
@@ -261,7 +243,7 @@ export default class App extends React.Component {
     ipcRenderer.send('activate-chat', chatId)
   }
 
-  sendMessage (message) {
+  composeMessage (message) {
     // Ensure message is not empty
     if (!message || !WORDS_REGEX.test(message)) return
 
@@ -299,28 +281,22 @@ export default class App extends React.Component {
           onCopyPGPClick={this.copyPGPHandler}
           onDeleteClick={this.deleteChatHandler}
         />
-        <AddModal
-          open={this.state.add}
-          onClose={this.closeModal}
-          onAddClick={this.composeChatHandler}
-          message={this.state.modalMessage}
-        />
         <Messenger
           sidebar={
             <ChatList
               chats={Object.values(this.state.chats)}
               activeChatId={this.state.activeChatId}
               onChatClick={this.activateChat}
-              onComposeClick={this.createComposeChat}
+              onComposeChatClick={this.createComposeChat}
               onDeleteClick={this.deleteChatHandler}
             />
           }
           content={
             <MessageList
               composing={this.state.composing}
-              onComposeChat={id => console.log(id)}
+              onComposeChat={this.composeChatHandler}
               chat={activeChat}
-              onSend={this.sendMessage}
+              onComposeMessage={this.composeMessage}
               onInfoClick={() => this.openModal('chatInfo')}
             />
           }

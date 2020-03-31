@@ -240,7 +240,7 @@ app.on('activate', windows.main.activate)
   )
 
   // Init PGP keys, state and chats and main window in parallel
-  const [keyExists, chatsExist] = await Promise.all([
+  const [keyExists] = await Promise.all([
     crypto.init(),
     chats.init(),
     state.init(),
@@ -260,20 +260,29 @@ app.on('activate', windows.main.activate)
   console.log('--> ' + userId)
   windows.main.send('log', userId)
 
-  // Authenticate with and connect to the signal server
-  const authRequest = await crypto.generateAuthRequest()
-  await signal.connect(userId, authRequest)
-  console.log('Connected to server')
+  // Get last active chat
+  const lastActiveChat = state.get('lastActiveChat', chats.getLatestId())
+  // Populate UI with chats
+  windows.main.send('update-chats', chats.getChats(), lastActiveChat)
 
-  // Check if any chats exist
-  if (chatsExist) {
-    // Get last active chat
-    const lastActiveChat = state.get('lastActiveChat', chats.getLatestId())
-    // Populate UI with chats
-    windows.main.send('update-chats', chats.getChats(), lastActiveChat)
-    // Establish connections with chat peers
-    Object.values(chats.getChats())
-      .filter(chat => !peers.has(chat.id)) // Ignore already connecting to
-      .forEach(chat => peers.connect(chat.id))
+  try {
+    // Authenticate with and connect to the signal server
+    const authRequest = await crypto.generateAuthRequest()
+    await signal.connect(userId, authRequest)
+    console.log('Connected to server')
+  } catch (error) {
+    // Notify user of it
+    windows.main.send(
+      'notify',
+      'Failed to connect to the server',
+      'error',
+      true,
+      4000
+    )
   }
+
+  // Establish connections with chat peers
+  Object.values(chats.getChats())
+    .filter(chat => !peers.has(chat.id)) // Ignore already connecting to
+    .forEach(chat => peers.connect(chat.id))
 })()

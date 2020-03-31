@@ -104,7 +104,6 @@ export default function MessageList (props) {
     : 'Compose a new chat to start messaging'
 
   if (props.composing) {
-    // TODO: listen for paste and try to parse as PGP
     toolbar = (
       <Toolbar
         leftItems={
@@ -152,7 +151,7 @@ export default function MessageList (props) {
         onChange={event => setMessage(event.target.value)}
         onKeyDown={onEnterPress(() => {
           // Send up
-          props.onSend(message)
+          props.onComposeMessage(message)
           // Clear message input
           setMessage('')
         })}

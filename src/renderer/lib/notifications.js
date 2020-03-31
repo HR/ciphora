@@ -1,4 +1,5 @@
 import React from 'react'
+import { hashCode } from './util'
 const Ctx = React.createContext()
 
 /**
@@ -8,27 +9,19 @@ const Ctx = React.createContext()
 const NotificationContainer = props => (
   <div className='notification-container' {...props} />
 )
-const Notification = ({ children, type, onDismiss }) => (
-  <div className={`notification ${type}`} onClick={onDismiss}>
+const Notification = ({ children, type, onDismiss, dismissable }) => (
+  <div className={`notification ${type}`} onClick={dismissable && onDismiss}>
     {children}
-    <span className='chat-delete ion-md-close' />
+    {dismissable && <span className='dismiss ion-md-close' />}
   </div>
 )
 
 /**
  * Provider
  *****************************/
-let notificationCount = 0
 
 export function NotificationProvider ({ children }) {
   const [notifications, setNotifications] = React.useState([])
-
-  // Show a notification
-  const show = (content, type = '') => {
-    const id = notificationCount++
-    const notification = { id, type, content }
-    setNotifications([...notifications, notification])
-  }
 
   // Dismiss a notification
   const dismiss = id => {
@@ -38,6 +31,21 @@ export function NotificationProvider ({ children }) {
 
   // Dismiss
   const onDismiss = id => () => dismiss(id)
+
+  // Show a notification
+  const show = (content, type, dismissable = true, duration) => {
+    type = type || ''
+    const id = hashCode(content)
+    const notification = { id, type, content, dismissable }
+    setNotifications(notifications => {
+      const alreadyShowing = notifications.find(n => n.id == id)
+      // Do not show if already showing
+      return alreadyShowing ? notifications : [notification, ...notifications]
+    })
+
+    // Dismiss after duration if specified
+    if (duration) setTimeout(onDismiss(id), duration)
+  }
 
   return (
     <Ctx.Provider value={{ show, dismiss }}>

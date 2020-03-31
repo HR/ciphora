@@ -40,6 +40,7 @@ module.exports = class Signal extends EventEmitter {
       // Add event listeners
       this._ws.on('message', this._emit)
       this._ws.on('open', resolve)
+      this._ws.on('error', reject)
     })
   }
 

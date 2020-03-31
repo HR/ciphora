@@ -26,7 +26,7 @@ const helpSubmenu = [
   }),
   {
     label: 'Report an Issue…',
-    click() {
+    click () {
       const body = `
 <!-- Please succinctly describe your issue and steps to reproduce it. -->
 
@@ -45,7 +45,8 @@ ${debugInfo()}`
 ]
 
 if (!is.macos) {
-  helpSubmenu.push({
+  helpSubmenu.push(
+    {
       type: 'separator'
     },
     aboutMenuItem({
@@ -55,15 +56,16 @@ if (!is.macos) {
   )
 }
 
-const debugSubmenu = [{
+const debugSubmenu = [
+  {
     label: 'Show Settings',
-    click() {
+    click () {
       config.openInEditor()
     }
   },
   {
     label: 'Show App Data',
-    click() {
+    click () {
       shell.openItem(app.getPath('userData'))
     }
   },
@@ -72,7 +74,7 @@ const debugSubmenu = [{
   },
   {
     label: 'Delete Settings',
-    click() {
+    click () {
       config.clear()
       app.relaunch()
       app.quit()
@@ -80,7 +82,7 @@ const debugSubmenu = [{
   },
   {
     label: 'Delete App Data',
-    click() {
+    click () {
       shell.moveItemToTrash(app.getPath('userData'))
       app.relaunch()
       app.quit()
@@ -89,16 +91,19 @@ const debugSubmenu = [{
 ]
 
 const macosTemplate = [
-  appMenu([{
-    label: 'Preferences…',
-    accelerator: 'Command+,',
-    click() {
-      showPreferences()
+  appMenu([
+    {
+      label: 'Preferences…',
+      accelerator: 'Command+,',
+      click () {
+        showPreferences()
+      }
     }
-  }]),
+  ]),
   {
     role: 'fileMenu',
-    submenu: [{
+    submenu: [
+      {
         label: 'Custom'
       },
       {
@@ -125,9 +130,11 @@ const macosTemplate = [
 ]
 
 // Linux and Windows
-const otherTemplate = [{
+const otherTemplate = [
+  {
     role: 'fileMenu',
-    submenu: [{
+    submenu: [
+      {
         label: 'Custom'
       },
       {
@@ -136,7 +143,7 @@ const otherTemplate = [{
       {
         label: 'Settings',
         accelerator: 'Control+,',
-        click() {
+        click () {
           showPreferences()
         }
       },

@@ -16,7 +16,7 @@ export default function ChatList (props) {
           <ToolbarButton
             key='create'
             icon='ion-ios-create'
-            onClick={props.onComposeClick}
+            onClick={props.onComposeChatClick}
           />
         ]}
       />

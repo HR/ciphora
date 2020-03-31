@@ -1,31 +1,32 @@
 'use strict'
 
-const main = module.exports = {
+const main = (module.exports = {
   init,
   secondInstance,
   activate,
   send,
   win: null
-}
-const { app, BrowserWindow } = require('electron'), { waitUntil } = require('../lib/util'), { LOAD_URL, MAIN_WIN_WIDTH, MAIN_WIN_HEIGHT } = require('../../config')
+})
+const { app, BrowserWindow } = require('electron'),
+  { waitUntil } = require('../lib/util'),
+  { LOAD_URL, MAIN_WIN_WIDTH, MAIN_WIN_HEIGHT } = require('../../config')
 
-async function init() {
+async function init () {
   let isWindowReady = false
-  const win = main.win = new BrowserWindow({
+  const win = (main.win = new BrowserWindow({
     title: app.name,
     show: false,
     width: MAIN_WIN_WIDTH,
     height: MAIN_WIN_HEIGHT,
     minWidth: 700,
     minHeight: 400,
-    transparent:true,
+    transparent: true,
     frame: false,
     titleBarStyle: 'hiddenInset',
     webPreferences: {
       nodeIntegration: true
     }
-  })
-
+  }))
 
   win.on('ready-to-show', () => {
     isWindowReady = true
@@ -46,7 +47,7 @@ async function init() {
   return win
 }
 
-function secondInstance() {
+function secondInstance () {
   if (main.win) {
     if (main.win.isMinimized()) {
       main.win.restore()
@@ -56,13 +57,13 @@ function secondInstance() {
   }
 }
 
-function activate() {
+function activate () {
   if (!main.win) {
     main.win = init()
   }
 }
 
-function send(channel, ...args) {
+function send (channel, ...args) {
   if (main.win) {
     main.win.webContents.send(channel, ...args)
   }

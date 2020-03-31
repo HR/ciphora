@@ -1,14 +1,14 @@
 .notification-container {
   position: fixed;
-  bottom: 20px;
+  bottom: 0;
   width: 100%;
 }
 
 .notification {
   margin: 0 auto;
+  margin-bottom: 15px;
   width: 300px;
   background: var(--light-two);
-  cursor: pointer;
   text-align: left;
   font-size: 14px;
   overflow: hidden;
@@ -24,8 +24,12 @@
     rgba(0, 0, 0, 0.12) 0px 6px 15px -2px;
 }
 
-.notification:focus {
-  opacity: 0.5;
+.notification>.dismiss:hover {
+  opacity: 0.8;
+}
+
+.notification>.dismiss {
+  cursor: pointer;
 }
 
 .dark .notification {
