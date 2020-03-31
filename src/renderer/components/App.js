@@ -6,7 +6,6 @@ import ChatInfoModal from './ChatInfoModal'
 import SetupIdentityModal from './SetupIdentityModal'
 import ImportPGPModal from './ImportPGPModal'
 import CreatePGPModal from './CreatePGPModal'
-import AddModal from './AddModal'
 import { useNotifications } from '../lib/notifications'
 import { clone, friendlyError } from '../lib/util'
 import { COMPOSE_CHAT_ID } from '../../consts'
@@ -53,7 +52,7 @@ export default class App extends React.Component {
     this.addChatHandler = this.composeChatHandler.bind(this)
     this.deleteChatHandler = this.deleteChatHandler.bind(this)
     this.activateChat = this.activateChat.bind(this)
-    this.sendMessage = this.composeMessage.bind(this)
+    this.composeMessage = this.composeMessage.bind(this)
     this.updateChats = this.updateChats.bind(this)
     this.handleModalError = this.handleModalError.bind(this)
     this.copyPGPHandler = this.copyPGPHandler.bind(this)
@@ -73,8 +72,13 @@ export default class App extends React.Component {
     ipcRenderer.on('notify', (event, ...args) => notifications.show(...args))
   }
 
-  updateChats (event, chats, activeChatId, closeModal) {
-    if (closeModal) this.closeModal()
+  updateChats (event, chats, activeChatId, clearState) {
+    if (clearState) {
+      // Reset state
+      this.closeModal()
+      this.deleteChatHandler(COMPOSE_CHAT_ID)
+      notifications.clear()
+    }
     let newState = { chats }
     if (activeChatId) newState = { activeChatId, ...newState }
     this.setState(newState)
@@ -192,13 +196,13 @@ export default class App extends React.Component {
   }
 
   composeChatHandler (id) {
-    let [ciphoraId] = id.match(CIPHORA_ID_REGEX)
-    let [publicKey] = id.match(PUBLIC_KEY_REGEX)
-    console.log('Got', ciphoraId, publicKey)
+    // Validate id
+    let [ciphoraId] = id.match(CIPHORA_ID_REGEX) || []
+    let [publicKey] = id.match(PUBLIC_KEY_REGEX) || []
 
     // Ensure id is either a valid CiphoraId or PGP public key
     if (!ciphoraId && !publicKey) {
-      notifications.show('Invalid CiphoraId or PGP key', 'error', true, 2000)
+      notifications.show('Invalid CiphoraId or PGP key', 'error', true, 3000)
       return
     }
 
@@ -217,19 +221,22 @@ export default class App extends React.Component {
     this.setState({ composing: false, chats, activeChatId })
   }
 
+  // Handles chat deletion request
   deleteChatHandler (id) {
     if (id === COMPOSE_CHAT_ID) {
       this.deleteComposeChat()
       return
     }
-    // ipcRenderer.send('delete-chat', id)
+    ipcRenderer.send('delete-chat', id)
   }
 
+  // Handles copy PGP key to clipboard request
   copyPGPHandler () {
     this.closeModal()
     ipcRenderer.send('copy-pgp', this.state.activeChatId)
   }
 
+  // Activates the selected chat
   activateChat (chatId) {
     // Check if clicked chat already active
     if (chatId === this.state.activeChatId) {
@@ -244,6 +251,7 @@ export default class App extends React.Component {
     ipcRenderer.send('activate-chat', chatId)
   }
 
+  // Handles sending messages
   composeMessage (message) {
     // Ensure message is not empty
     if (!message || !WORDS_REGEX.test(message)) return

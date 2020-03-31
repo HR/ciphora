@@ -44,7 +44,7 @@ module.exports = class Signal extends EventEmitter {
     })
   }
 
-  // Emits signal event
+  // Emits a received signal event
   _emit (msg) {
     const { event, data } = JSON.parse(msg)
     console.log(`Signal event: ${event}`)

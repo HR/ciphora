@@ -42,6 +42,7 @@ module.exports = class Peers extends EventEmitter {
   // Handles signal requests
   _onSignalRequest ({ senderId, timestamp }) {
     console.log('Signal request received')
+    // TODO: Check added if in added chats (subscribe to its list using RxJS?)
     const request = this._requests[senderId]
     // If a request to the sender has not already been sent then just accept it
     // Add receiver to receive signal
@@ -88,7 +89,7 @@ module.exports = class Peers extends EventEmitter {
   }
 
   // Handles offline receivers
-  _onSignalReceiverOffline (receiverId) {
+  _onSignalReceiverOffline ({ receiverId }) {
     if (this._requests[receiverId]) {
       console.log('Signal receiver offline')
       // Delete request to allow offline peer to connect if it comes online

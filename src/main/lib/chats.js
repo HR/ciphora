@@ -68,8 +68,13 @@ module.exports = class Chats {
   }
 
   // Adds a chat
-  async add (id, chat) {
-    this._chats[id] = chat
+  async add (id, publicKeyArmored, address) {
+    this._chats[id] = {
+      id,
+      publicKeyArmored,
+      ...address,
+      messages: []
+    }
     await this._saveChats()
   }
 
@@ -77,6 +82,7 @@ module.exports = class Chats {
   async delete (id) {
     delete this._chats[id]
     await this._saveChats()
+    console.log('Deleted chat', id)
   }
 
   // Adds a message

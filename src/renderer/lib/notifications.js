@@ -10,7 +10,10 @@ const NotificationContainer = props => (
   <div className='notification-container' {...props} />
 )
 const Notification = ({ children, type, onDismiss, dismissable }) => (
-  <div className={`notification ${type}`} onClick={dismissable && onDismiss}>
+  <div
+    className={`notification ${type}`}
+    onClick={dismissable ? onDismiss : undefined}
+  >
     {children}
     {dismissable && <span className='dismiss ion-md-close' />}
   </div>
@@ -32,6 +35,11 @@ export function NotificationProvider ({ children }) {
   // Dismiss
   const onDismiss = id => () => dismiss(id)
 
+  // Clears all notifications
+  const clear = () => {
+    setNotifications([])
+  }
+
   // Show a notification
   const show = (content, type, dismissable = true, duration) => {
     type = type || ''
@@ -48,7 +56,7 @@ export function NotificationProvider ({ children }) {
   }
 
   return (
-    <Ctx.Provider value={{ show, dismiss }}>
+    <Ctx.Provider value={{ show, dismiss, clear }}>
       {children}
       <NotificationContainer>
         {notifications.map(({ content, id, ...rest }) => (

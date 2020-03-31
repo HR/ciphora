@@ -117,9 +117,9 @@ export default function MessageList (props) {
               value={id}
               onChange={event => setId(event.target.value)}
               onKeyDown={onEnterPress(() => props.onComposeChat(id))}
-              onPaste={event =>
-                props.onComposeChat(event.clipboardData.getData('Text'))
-              }
+              onPaste={event => {
+                props.onComposeChat(event.clipboardData.getData('text/plain'))
+              }}
             />
           </div>
         }

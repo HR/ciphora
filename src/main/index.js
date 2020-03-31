@@ -51,9 +51,7 @@ app.on('window-all-closed', () => {
 
 app.on('activate', windows.main.activate)
 ;(async () => {
-  let userId,
-    chatRequests = {},
-    chatRequestsAccepted = {}
+  let userId
   await app.whenReady()
   Menu.setApplicationMenu(menu)
 
@@ -73,15 +71,13 @@ app.on('activate', windows.main.activate)
   // When a new chat request is received from a user
   signal.on('chat-request', async ({ senderPublicKey: publicKeyArmored }) => {
     console.log('Chat request received')
+    // TODO: Check id against block/removed list and add to chats
     const { id, address } = await crypto.getPublicKeyInfoOf(publicKeyArmored)
     if (!chats.has(id)) {
-      // Add to accepted request if not already added
-      chatRequestsAccepted[id] = {
-        id,
-        publicKeyArmored,
-        ...address,
-        messages: []
-      }
+      // Add chat if not already added
+      await chats.add(id, publicKeyArmored, address)
+      await crypto.addKey(id, publicKeyArmored)
+      windows.main.send('update-chats', chats.getChats(), null)
     }
     // Accept chat request by default
     signal.send('chat-accept', {
@@ -93,15 +89,24 @@ app.on('activate', windows.main.activate)
   // When the chat request is accepted from the user
   signal.on('chat-accept', async ({ senderId, senderPublicKey }) => {
     console.log('Chat request accepted')
+    const { address } = await crypto.getPublicKeyInfoOf(senderPublicKey)
+    // Add chat
+    await chats.add(senderId, senderPublicKey, address)
+    await crypto.addKey(senderId, senderPublicKey)
+    // Update UI
+    windows.main.send('update-chats', chats.getChats(), senderId, true)
     // Establish a connection
     peers.connect(senderId)
   })
   // When the user for a new chat request cannot be found
-  signal.on('unknown-receiver', receiverId => {
-    if (chatRequests[receiverId]) {
+  signal.on('unknown-receiver', ({ type, receiverId }) => {
+    if (type === 'chat-request') {
       windows.main.send(
-        'modal-error',
-        'Contact not found on Ciphora or is offline'
+        'notify',
+        'Recipient not on Ciphora or is offline',
+        'error',
+        true,
+        4000
       )
     }
   })
@@ -109,33 +114,12 @@ app.on('activate', windows.main.activate)
   // When a new connection with a user is established
   peers.on('connect', async userId => {
     console.log('Connected with', userId)
-    // Find the chat requests object that has the userId
-    const chatReqs = [chatRequestsAccepted, chatRequests].find(
-      reqs => reqs[userId]
-    )
-    // Process any pending requests
-    if (chatReqs) {
-      console.log('Adding user to the UI')
-      let { publicKeyArmored, ...chatRequest } = chatReqs[userId]
-
-      // Move from request to new chat
-      await chats.add(chatRequest.id, chatRequest)
-      // Add the PGP key
-      await crypto.addKey(chatRequest.id, publicKeyArmored)
-      // Remove fulfilled request
-      delete chatReqs[chatRequest.id]
-      // Open the chat in the UI
-      windows.main.send('update-chats', chats.getChats(), chatRequest.id, true)
-    }
-
     // Initialises a chat session
     const keyMessage = await crypto.initSession(userId)
     // Send the master secret public key with signature to the user
     peers.sendKey(userId, keyMessage)
-
     // Set user as online
     chats.setOnline(userId)
-
     // Update UI
     windows.main.send('update-chats', chats.getChats())
   })
@@ -183,31 +167,21 @@ app.on('activate', windows.main.activate)
   })
   // When the user adds a new chat with a new recipient
   ipcMain.on('add-chat', async (event, ciphoraId, publicKeyArmored) => {
-    let extras = {}
     if (!ciphoraId) {
       try {
         // Try to get the ciphoraId from public key and address
-        const { id, address } = await crypto.getPublicKeyInfoOf(
-          publicKeyArmored
-        )
+        const { id } = await crypto.getPublicKeyInfoOf(publicKeyArmored)
         ciphoraId = id
-        extras = { ...address, publicKeyArmored }
       } catch (err) {
-        windows.main.send('notify', 'Invalid PGP key', null, true, 4000)
+        windows.main.send('notify', 'Invalid PGP key', 'error', true, 4000)
       }
     }
-
+    // Normalise id
+    ciphoraId = ciphoraId.toLowerCase()
     // Ensure it hasn't been already added or is own
     if (chats.has(ciphoraId) || ciphoraId === userId) {
       windows.main.send('notify', 'Already added', null, true, 4000)
       return
-    }
-
-    // Create chat request
-    chatRequests[ciphoraId] = {
-      ciphoraId,
-      ...extras,
-      messages: []
     }
 
     // Send a chat request message to the recipient
