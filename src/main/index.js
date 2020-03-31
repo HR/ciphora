@@ -83,15 +83,16 @@ app.on('activate', windows.main.activate)
         messages: []
       }
     }
-
-    const senderPublicKey = crypto.getPublicKey()
-    signal.send('chat-accept', { senderPublicKey, receiverId: id })
+    // Accept chat request by default
+    signal.send('chat-accept', {
+      senderPublicKey: crypto.getPublicKey(),
+      receiverId: id
+    })
     console.log('Chat request accepted')
   })
   // When the chat request is accepted from the user
   signal.on('chat-accept', async ({ senderId, senderPublicKey }) => {
     console.log('Chat request accepted')
-
     // Establish a connection
     peers.connect(senderId)
   })
@@ -116,6 +117,7 @@ app.on('activate', windows.main.activate)
     if (chatReqs) {
       console.log('Adding user to the UI')
       let { publicKeyArmored, ...chatRequest } = chatReqs[userId]
+
       // Move from request to new chat
       await chats.add(chatRequest.id, chatRequest)
       // Add the PGP key
@@ -179,35 +181,40 @@ app.on('activate', windows.main.activate)
     console.log('Sending message', encryptedMessage)
     peers.sendMessage(receiverId, encryptedMessage)
   })
-  // When the user adds a new chat with a new contact
-  ipcMain.on('add-chat', async (event, publicKeyArmored) => {
-    // Get the contact's id and info
-    const { id, address } = await crypto.getPublicKeyInfoOf(publicKeyArmored)
+  // When the user adds a new chat with a new recipient
+  ipcMain.on('add-chat', async (event, ciphoraId, publicKeyArmored) => {
+    let extras = {}
+    if (!ciphoraId) {
+      try {
+        // Try to get the ciphoraId from public key and address
+        const { id, address } = await crypto.getPublicKeyInfoOf(
+          publicKeyArmored
+        )
+        ciphoraId = id
+        extras = { ...address, publicKeyArmored }
+      } catch (err) {
+        windows.main.send('notify', 'Invalid PGP key', null, true, 4000)
+      }
+    }
+
     // Ensure it hasn't been already added or is own
-    console.log(id, chats.getChats())
-    if (chats.has(id) || id === userId) {
-      windows.main.send('modal-error', 'Already added')
+    if (chats.has(ciphoraId) || ciphoraId === userId) {
+      windows.main.send('notify', 'Already added', null, true, 4000)
       return
     }
 
-    // Get owm public key
-    const senderPublicKey = crypto.getPublicKey()
-    chatRequests[id] = {
-      id,
-      publicKeyArmored,
-      ...address,
+    // Create chat request
+    chatRequests[ciphoraId] = {
+      ciphoraId,
+      ...extras,
       messages: []
     }
 
-    let chatRequest = {
-      senderPublicKey,
-      receiverId: id,
-      timestamp: new Date().toISOString()
-    }
-
-    chatRequest.signature = crypto.sign(JSON.stringify(chatRequest))
-    // Send a chat request to the contact
-    signal.send('chat-request', chatRequest)
+    // Send a chat request message to the recipient
+    signal.send('chat-request', {
+      senderPublicKey: crypto.getPublicKey(),
+      receiverId: ciphoraId
+    })
     console.log('Chat request sent')
   })
   // When user wants to deletes chat

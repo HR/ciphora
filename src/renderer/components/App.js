@@ -202,9 +202,10 @@ export default class App extends React.Component {
       return
     }
 
+    // TODO: replace with progress bar under compose
     notifications.show('Composing chat...', null, false)
 
-    // ipcRenderer.send('add-chat', pubKey[0])
+    ipcRenderer.send('add-chat', ciphoraId, publicKey)
   }
 
   // Deletes the chat being composed
