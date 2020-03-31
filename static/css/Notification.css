@@ -1,0 +1,37 @@
+.notification-container {
+  position: fixed;
+  bottom: 20px;
+  width: 100%;
+}
+
+.notification {
+  margin: 0 auto;
+  width: 300px;
+  background: var(--light-two);
+  cursor: pointer;
+  text-align: left;
+  font-size: 14px;
+  overflow: hidden;
+  border-radius: 0.4rem;
+  padding: 1rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  justify-items: center;
+  box-shadow: rgba(0, 0, 0, 0.15) 0px 1px 10px 0px,
+    rgba(0, 0, 0, 0.1) 0px 6px 12px 0px,
+    rgba(0, 0, 0, 0.12) 0px 6px 15px -2px;
+}
+
+.notification:focus {
+  opacity: 0.5;
+}
+
+.dark .notification {
+  background: var(--dark-two);
+}
+
+.error.notification {
+  background: var(--bg-danger);
+}

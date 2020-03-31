@@ -7,6 +7,7 @@ import SetupIdentityModal from './SetupIdentityModal'
 import ImportPGPModal from './ImportPGPModal'
 import CreatePGPModal from './CreatePGPModal'
 import AddModal from './AddModal'
+import { useNotifications } from '../lib/notifications'
 import { COMPOSE_CHAT_ID } from '../../consts'
 import { ipcRenderer } from 'electron'
 import '../../../static/css/*.css'
@@ -14,6 +15,7 @@ import '../../../static/css/*.css'
 if (module.hot) {
   module.hot.accept()
 }
+let notifications = null
 // Initial modal state used to reset modals
 const initModalsState = {
   setupIdentity: false,
@@ -45,6 +47,7 @@ function clone (obj) {
 }
 
 export default class App extends React.Component {
+  static contextType = useNotifications(true)
   constructor (props) {
     super(props)
     this.state = {
@@ -65,11 +68,14 @@ export default class App extends React.Component {
     this.updateChats = this.updateChats.bind(this)
     this.handleModalError = this.handleModalError.bind(this)
     this.copyPGPHandler = this.copyPGPHandler.bind(this)
-    this.onComposeChatHandler = this.createComposeChat.bind(this)
+    this.createComposeChat = this.createComposeChat.bind(this)
     this.deleteNewChat = this.deleteComposeChat.bind(this)
   }
 
   componentDidMount () {
+    // Init notifications via the context
+    notifications = this.context
+    // Add event listeners
     ipcRenderer.on('log', (event, data) => console.log(data))
     ipcRenderer.on('open-modal', (event, modal) => this.openModal(modal))
     ipcRenderer.on('update-chats', this.updateChats)
