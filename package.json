@@ -17,7 +17,7 @@
     "postinstall": "electron-builder install-app-deps",
     "rebuild": "electron-rebuild -f .",
     "test": "npm run lint",
-    "start": "{ npm run bundler & gulp; }",
+    "start": "{ npm run bundle & gulp; }",
     "bundler": "BROWSER=none webpack-dev-server --mode development",
     "bundle": "webpack --mode production",
     "electron": "electron .",
