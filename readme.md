@@ -17,7 +17,7 @@
 </p>
 
 
-A peer-to-peer end-to-end encrypted messaging app. Implements the secure [signal protocol](https://signal.org/docs/specifications/doubleratchet/) for end-to-end encryption of messages and [PGP](https://en.wikipedia.org/wiki/Pretty_Good_Privacy) for identity verification and authentication. This approach not only protects against [man-in-the-middle attacks](https://en.wikipedia.org/wiki/Man-in-the-middle_attack) but removes the need for in-person verification like with other apps (WhatsApp, Signal,...) where identity keypairs are generated on a per-device basis and each has to be verified manually in-person.
+A peer-to-peer end-to-end encrypted messaging app. Implements the secure [signal protocol](https://signal.org/docs/specifications/doubleratchet/) for the end-to-end encryption of messages and [PGP](https://en.wikipedia.org/wiki/Pretty_Good_Privacy) for identity verification and authentication. This approach not only protects against [man-in-the-middle attacks](https://en.wikipedia.org/wiki/Man-in-the-middle_attack) but removes the need for in-person verification like with other E2E encryption apps (WhatsApp, Signal,...) where identity keypairs are generated on a per-device basis and each has to be verified manually in-person.
 
 ## Install
 
