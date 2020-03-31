@@ -1,0 +1,53 @@
+.messenger {
+  display: grid;
+  width: 100%;
+  height: 100vh;
+  background: var(--light-three);
+  grid-template-columns: 270px auto;
+  grid-template-rows: 60px auto 60px;
+  grid-column-gap: 1px;
+  grid-row-gap: 1px;
+}
+
+.dark .messenger {
+  background: var(--dark-three);
+}
+
+.container {
+  padding: 10px;
+}
+
+.scrollable {
+  position: relative;
+  overflow-y: scroll;
+  -webkit-overflow-scrolling: touch;
+}
+
+.sidebar {
+  background: var(--light-one);
+  grid-row-start: 1;
+  grid-row-end: span 3;
+}
+
+.dark .sidebar {
+  background: var(--dark-one);
+}
+
+.content {
+  background: var(--light-one);
+  grid-row-start: 1;
+  grid-row-end: span 3;
+}
+
+.dark .content {
+  background: var(--dark-one);
+}
+
+.footer {
+  grid-column-start: 2;
+  background: var(--light-one);
+}
+
+.footer {
+  background: var(--dark-one);
+}

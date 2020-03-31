@@ -1,0 +1,43 @@
+.toolbar {
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+  position: sticky;
+  top: 0px;
+  border: none;
+  background-color: var(--light-five);
+  backdrop-filter: blur(20px);
+}
+
+.dark .toolbar {
+  background-color: var(--dark-five);
+}
+
+.toolbar-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.left-items, .right-items {
+  flex: 1;
+  padding: 10px;
+  display: flex;
+}
+
+.right-items {
+  flex-direction: row-reverse;
+}
+
+.left-items .toolbar-button {
+  margin-right: 20px;
+}
+
+.right-items .toolbar-button {
+  margin-left: 20px;
+}
+
+.left-items .toolbar-button:last-child,
+.right-items .toolbar-button:last-child {
+  margin: 0;
+}

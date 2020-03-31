@@ -1,0 +1,131 @@
+.modal-cover {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, .6);
+  width: 100%;
+  height: 100%;
+  z-index: 50;
+  display: none;
+}
+
+.modal-cover.modal-cover-active {
+  display: block;
+}
+
+.modal-container {
+  --background: var(--light-one);
+  z-index: 1050;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: 1px solid var(--light-two);
+  border-radius: 6px;
+  background: var(--background);
+  width: 550px;
+  min-height: 350px;
+  display: none;
+  box-shadow: 0 0 60px 10px rgba(0, 0, 0, 0.9);
+  text-align: center;
+  padding: 1rem;
+}
+
+.modal-container {
+  --background: var(--dark-one);
+  border: 1px solid var(--dark-two);
+}
+
+.modal-container.modal-container-active {
+  display: block;
+}
+
+.modal-header h1 {
+  font-size: 1.8rem;
+  margin-top: 6px;
+  margin-bottom: 17px;
+}
+
+.modal-header p {
+  font-size: 1rem;
+  margin-top: 0;
+}
+
+.modal-header i {
+  font-size: 80px;
+}
+
+.modal-body {
+  margin-top: 34px;
+}
+
+.modal-body hr.divider {
+  overflow: visible;
+  padding: 0;
+  margin-top: 21px;
+  margin-bottom: 4px;
+  border: none;
+  border-top: 1px solid var(--light-two);
+  width: 200px;
+}
+
+.dark .modal-body hr.divider {
+  border-top: 1px solid var(--dark-two);
+}
+
+.modal-body hr.divider:after {
+  content: "or";
+  display: inline-block;
+  position: relative;
+  top: -10px;
+  padding: 0 16px;
+  background: var(--background);
+}
+
+.modal-container .cancel {
+  position: absolute;
+  right: 20px;
+  top: 5px;
+  font-size: 2rem;
+  padding: 4px;
+}
+
+.modal-body textarea, .modal-body input, .modal-body select {
+  font-size: 0.9rem;
+  width: 480px;
+  background: var(--light-two);
+  color: var(--light-nine);
+  border: none;
+  padding: 15px;
+  margin-bottom: 10px;
+  border-radius: .2em;
+}
+
+.modal-body select {
+  width: 510px;
+}
+
+.modal-body textarea {
+  font-family: monospace;
+  height: 40vh;
+  resize: none;
+}
+
+.dark .modal-body textarea, .dark .modal-body input, .modal-body select {
+  background: var(--dark-two);
+  color: var(--dark-nine);
+}
+
+.modal-container .error-message {
+  color: var(--text-danger);
+  margin: 0;
+  margin-bottom: 10px;
+}
+
+.modal-container .message {
+  color: var(--dark-blue);
+  margin: 0;
+  margin-bottom: 10px;
+}

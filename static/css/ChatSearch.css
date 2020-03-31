@@ -1,0 +1,25 @@
+.chat-search {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-search-input {
+  background: var(--light-two);
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: none;
+  font-size: 14px;
+}
+
+.dark .chat-search-input {
+  background: var(--dark-two);
+}
+
+.chat-search-input::placeholder {
+  text-align: center;
+}
+
+.chat-search-input:focus::placeholder {
+  text-align: left;
+}

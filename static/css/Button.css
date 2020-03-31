@@ -1,0 +1,40 @@
+button {
+  display: inline-block;
+  border: none;
+  border-radius: 30px;
+  padding: 0.6rem 2rem;
+  margin: 0;
+  text-decoration: none;
+  background: var(--light-blue);
+  color: var(--light-nine);
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  text-align: center;
+  transition: background 250ms ease-in-out,
+    transform 150ms ease;
+  -webkit-appearance: none;
+}
+
+.dark button {
+  background: var(--dark-blue);
+  color: var(--dark-nine);
+}
+
+button:hover,
+button:focus {
+  filter: brightness(85%);
+  cursor: pointer;
+}
+
+button:active {
+  transform: scale(0.99);
+}
+
+button:disabled {
+  background: var(--light-three);
+}
+
+.dark button:disabled {
+  background: var(--dark-three);
+}

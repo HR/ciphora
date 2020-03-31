@@ -1,0 +1,26 @@
+.toolbar-button {
+  color: var(--light-blue);
+  font-size: 28px;
+  transition: all 0.1s;
+}
+
+.dark .toolbar-button {
+  color: var(--dark-blue);
+  font-size: 28px;
+  transition: all 0.1s;
+}
+
+.toolbar-button:hover {
+  cursor: pointer;
+  filter: brightness(85%);
+}
+
+.toolbar-button:active {
+  color: var(--light-blue);
+  opacity: 0.25;
+}
+
+.dark .toolbar-button:active {
+  color: var(--dark-blue);
+  opacity: 0.25;
+}
