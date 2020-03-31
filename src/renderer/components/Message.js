@@ -1,12 +1,17 @@
 import React from 'react'
 import moment from 'moment'
 
+const timeFormat = {
+  sameDay: '[Today,] HH:mm',
+  lastDay: '[Yesterday,] HH:mm',
+  lastWeek: 'dddd [,] HH:mm',
+  sameElse: 'dddd, D MMMM, YYYY HH:mm'
+}
+
 export default function Message (props) {
   const { data, isMine, startsSequence, endsSequence, showTimestamp } = props
 
-  const friendlyTimestamp = moment(data.timestamp)
-    .format('dddd, D MMMM  HH:mm')
-    .toLocaleUpperCase()
+  const friendlyTimestamp = moment(data.timestamp).calendar(null, timeFormat)
   return (
     <div
       className={[

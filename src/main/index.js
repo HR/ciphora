@@ -159,6 +159,7 @@ app.on('activate', windows.main.activate)
     console.log('Adding message', message)
     // TODO: Queue message if not connected / no session for later
     chats.addMessage(receiverId, message)
+    // Optimistically update UI
     windows.main.send('update-chats', chats.getChats())
 
     const encryptedMessage = await crypto.encrypt(receiverId, message)
