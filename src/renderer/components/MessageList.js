@@ -139,11 +139,6 @@ export default function MessageList (props) {
       </div>
       <div ref={messagesEndRef} />
 
-      {/*<Compose rightItems={[
-        <ToolbarButton key="file" icon="ion-ios-share" />,
-        <ToolbarButton key="image" icon="ion-image" />,
-        <ToolbarButton key="audio" icon="ion-mic" />,
-      ]}/>*/}
       <Compose
         disabled={props.composing || !props.chat}
         placeholder={placeholder}
@@ -155,6 +150,10 @@ export default function MessageList (props) {
           // Clear message input
           setMessage('')
         })}
+        rightItems={[
+          <ToolbarButton key='image' icon='ion-ios-image' />,
+          <ToolbarButton key='file' icon='ion-ios-share' />
+        ]}
       />
     </div>
   )

@@ -1,7 +1,10 @@
-.message-list-container {
-  padding: 10px;
-  padding-bottom: 70px;
+.message-list {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
-.message-list-container::-webkit-scrollbar {
-    display: none;
+
+.message-list-container {
+  flex: 1 1 auto;
+  padding: 10px;
 }

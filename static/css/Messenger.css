@@ -20,7 +20,10 @@
 .scrollable {
   position: relative;
   overflow-y: scroll;
-  -webkit-overflow-scrolling: touch;
+}
+
+.scrollable::-webkit-scrollbar {
+  width: 0 !important
 }
 
 .sidebar {

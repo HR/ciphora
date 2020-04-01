@@ -157,11 +157,11 @@ app.on('activate', windows.main.activate)
     // Set the id of the message to its hash
     message.id = crypto.hash(JSON.stringify(message))
     console.log('Adding message', message)
-    // TODO: Queue message if not connected / no session for later
     chats.addMessage(receiverId, message)
     // Optimistically update UI
     windows.main.send('update-chats', chats.getChats())
-
+    // TODO: Queue message if not connected / no session for later
+    if (!peers.isConnected(receiverId)) return
     const encryptedMessage = await crypto.encrypt(receiverId, message)
     console.log('Sending message', encryptedMessage)
     peers.sendMessage(receiverId, encryptedMessage)

@@ -3,8 +3,7 @@
   display: flex;
   align-items: center;
   border-top: 1px solid var(--light-three);
-  position: fixed;
-  width: calc(100% - 20px);
+  position: sticky;
   bottom: 0px;
   border: none;
   background-color: var(--light-five);
@@ -29,7 +28,7 @@
 }
 
 .compose .toolbar-button {
-  margin-left: 15px;
+  margin: 0 10px;
 }
 
 .compose-chat {
@@ -39,16 +38,16 @@
   align-items: center;
 }
 
-.compose-chat > span {
+.compose-chat>span {
   opacity: 0.5;
   margin: 5px;
 }
 
-.compose-chat > .compose-input {
+.compose-chat>.compose-input {
   height: inherit !important;
   padding: 5px;
 }
 
-.compose-chat > .compose-input::placeholder {
+.compose-chat>.compose-input::placeholder {
   font-size: 16px;
 }
