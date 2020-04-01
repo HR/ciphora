@@ -132,11 +132,11 @@ module.exports = class Peers extends EventEmitter {
 
     peer.on('error', err => this.emit('error', userId, err))
 
-    peer.on('data', data => {
+    peer.on('data', binMessage => {
       // Try to deserialize message
       try {
-        const dataString = Buffer.isBuffer(data) ? data.toString() : data
-        const { type, ...message } = JSON.parse(dataString)
+        const serializedMessage = binMessage.toString('utf8')
+        const { type, ...message } = JSON.parse(serializedMessage)
         console.log(`Got ${type}:`, message)
         this.emit(type, userId, message)
       } catch (e) {
@@ -187,7 +187,8 @@ module.exports = class Peers extends EventEmitter {
       type,
       ...message
     })
-    this._peers[receiverId].send(serializedMessage)
+    const binMessage = Buffer.from(serializedMessage, 'utf8')
+    this._peers[receiverId].write(binMessage)
     console.log(type, 'sent', message)
     return true
   }

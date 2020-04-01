@@ -20,6 +20,7 @@
 .message .bubble-container {
   font-size: 14px;
   display: flex;
+  word-wrap: break-word;
 }
 
 .message.mine .bubble-container {
@@ -56,6 +57,11 @@
   border-bottom-left-radius: 2px;
   border-top-right-radius: 20px;
   border-bottom-right-radius: 20px;
+}
+
+.message .bubble-container img.bubble {
+  padding: 0px !important;
+  object-fit: contain;
 }
 
 .dark .message .bubble-container .bubble {

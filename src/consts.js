@@ -17,5 +17,10 @@ module.exports = {
     'ecc-brainpoolP384r1',
     'ecc-brainpoolP512r1'
   ],
-  COMPOSE_CHAT_ID: 'newchat'
+  COMPOSE_CHAT_ID: 'newchat',
+  CONTENT_TYPES: {
+    TEXT: 'text',
+    IMAGE: 'image',
+    FILE: 'file'
+  }
 }

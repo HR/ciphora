@@ -1,6 +1,8 @@
 'use strict'
 
 const { app, Menu, ipcMain, clipboard } = require('electron'),
+  { readFile } = require('fs').promises,
+  { basename } = require('path'),
   { is } = require('electron-util'),
   unhandled = require('electron-unhandled'),
   debug = require('electron-debug'),
@@ -14,6 +16,7 @@ const { app, Menu, ipcMain, clipboard } = require('electron'),
   Peers = require('./lib/peers'),
   Chats = require('./lib/chats'),
   State = require('./lib/state'),
+  { CONTENT_TYPES } = require('../consts'),
   menu = require('./menu'),
   ipc = require('./ipc'),
   windows = require('./windows'),
@@ -36,7 +39,7 @@ if (!is.development) {
   // Someone tried to run a second instance, so focus the main window
   app.on('second-instance', windows.main.secondInstance)
 } else {
-  // Prevent multiple instances of the app
+  // Allow multiple instances of the app in dev
   if (!app.requestSingleInstanceLock()) {
     console.log('Second instance')
     dbPath += '2'
@@ -147,25 +150,42 @@ app.on('activate', windows.main.activate)
   })
 
   // When a message is sent by the user
-  ipcMain.on('send-message', async (event, content, receiverId) => {
-    let message = {
-      sender: userId,
-      content,
-      contentType: 'text/plain', // mime-type of message
-      timestamp: new Date().toISOString()
+  ipcMain.on(
+    'send-message',
+    async (event, contentType, content, receiverId) => {
+      // Construct message
+      let message = {
+        sender: userId,
+        content,
+        contentType, // mime-type of message
+        timestamp: new Date().toISOString()
+      }
+
+      if (
+        contentType === CONTENT_TYPES.IMAGE ||
+        contentType === CONTENT_TYPES.FILE
+      ) {
+        let [contentPath] = content
+        // Attach file name
+        message.contentName = basename(contentPath)
+        // Set to the file's contents in base64
+        message.content = await readFile(contentPath, { encoding: 'base64' })
+      }
+
+      console.log(message)
+      // Set the id of the message to its hash
+      message.id = crypto.hash(JSON.stringify(message))
+      console.log('Adding message', message)
+      chats.addMessage(receiverId, message)
+      // Optimistically update UI
+      windows.main.send('update-chats', chats.getChats())
+      // TODO: Queue message if not connected / no session for later
+      if (!peers.isConnected(receiverId)) return
+      const encryptedMessage = await crypto.encrypt(receiverId, message)
+      console.log('Sending message', encryptedMessage)
+      peers.sendMessage(receiverId, encryptedMessage)
     }
-    // Set the id of the message to its hash
-    message.id = crypto.hash(JSON.stringify(message))
-    console.log('Adding message', message)
-    chats.addMessage(receiverId, message)
-    // Optimistically update UI
-    windows.main.send('update-chats', chats.getChats())
-    // TODO: Queue message if not connected / no session for later
-    if (!peers.isConnected(receiverId)) return
-    const encryptedMessage = await crypto.encrypt(receiverId, message)
-    console.log('Sending message', encryptedMessage)
-    peers.sendMessage(receiverId, encryptedMessage)
-  })
+  )
   // When the user adds a new chat with a new recipient
   ipcMain.on('add-chat', async (event, ciphoraId, publicKeyArmored) => {
     if (!ciphoraId) {

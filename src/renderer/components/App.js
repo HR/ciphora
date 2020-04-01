@@ -8,13 +8,16 @@ import ImportPGPModal from './ImportPGPModal'
 import CreatePGPModal from './CreatePGPModal'
 import { useNotifications } from '../lib/notifications'
 import { clone, friendlyError } from '../lib/util'
-import { COMPOSE_CHAT_ID } from '../../consts'
-import { ipcRenderer } from 'electron'
+import { COMPOSE_CHAT_ID, CONTENT_TYPES } from '../../consts'
+import { ipcRenderer, remote } from 'electron'
 import '../../../static/css/*.css'
 
 if (module.hot) {
   module.hot.accept()
 }
+
+const { dialog } = remote
+// Notification ref
 let notifications = null
 // Initial modal state used to reset modals
 const initModalsState = {
@@ -33,6 +36,15 @@ const CIPHORA_ID_REGEX = /^[0-9a-fA-F]{40}$/
 const WORDS_REGEX = /\S/
 const PUBLIC_KEY_REGEX = /-----BEGIN PGP PUBLIC KEY BLOCK-----(.|\n|\r|\r\n)+-----END PGP PUBLIC KEY BLOCK-----/
 const PRIVATE_KEY_REGEX = /-----BEGIN PGP PRIVATE KEY BLOCK-----(.|\n|\r|\r\n)+-----END PGP PRIVATE KEY BLOCK-----/m
+//
+let FILTERS = {}
+FILTERS[CONTENT_TYPES.IMAGE] = [
+  {
+    name: 'Images',
+    extensions: ['jpg', 'jpeg', 'svg', 'png', 'apng', 'gif']
+  }
+]
+FILTERS[CONTENT_TYPES.FILE] = [{ name: 'All Files', extensions: ['*'] }]
 
 export default class App extends React.Component {
   static contextType = useNotifications(true)
@@ -57,7 +69,8 @@ export default class App extends React.Component {
     this.handleModalError = this.handleModalError.bind(this)
     this.copyPGPHandler = this.copyPGPHandler.bind(this)
     this.createComposeChat = this.createComposeChat.bind(this)
-    this.deleteNewChat = this.deleteComposeChat.bind(this)
+    this.deleteComposeChat = this.deleteComposeChat.bind(this)
+    this.sendFileHandler = this.sendFileHandler.bind(this)
 
     // Add event listeners
     ipcRenderer.on('log', (event, data) => console.log(data))
@@ -73,13 +86,13 @@ export default class App extends React.Component {
   }
 
   updateChats (event, chats, activeChatId, clearState) {
+    let newState = { chats }
     if (clearState) {
       // Reset state
       this.closeModal()
-      this.deleteChatHandler(COMPOSE_CHAT_ID)
       notifications.clear()
+      newState.composing = false
     }
-    let newState = { chats }
     if (activeChatId) newState = { activeChatId, ...newState }
     this.setState(newState)
   }
@@ -256,7 +269,31 @@ export default class App extends React.Component {
     // Ensure message is not empty
     if (!message || !WORDS_REGEX.test(message)) return
 
-    ipcRenderer.send('send-message', message, this.state.activeChatId)
+    ipcRenderer.send(
+      'send-message',
+      CONTENT_TYPES.TEXT,
+      message,
+      this.state.activeChatId
+    )
+  }
+
+  // Handles sending files
+  async sendFileHandler (type) {
+    const title = `Select the ${type} to send`
+    // Filter based on type selected
+    const filters = FILTERS[type]
+    const { canceled, filePaths } = await dialog.showOpenDialog(
+      remote.getCurrentWindow(),
+      {
+        properties: ['openFile'],
+        title,
+        filters
+      }
+    )
+    // Ignore if user cancelled
+    if (canceled || !filePaths) return
+    console.log(filters, filePaths)
+    ipcRenderer.send('send-message', type, filePaths, this.state.activeChatId)
   }
 
   // TODO: consistenly use 'compose' chat and message naming
@@ -306,6 +343,7 @@ export default class App extends React.Component {
               onComposeChat={this.composeChatHandler}
               chat={activeChat}
               onComposeMessage={this.composeMessage}
+              onSendFileClick={this.sendFileHandler}
               onInfoClick={() => this.openModal('chatInfo')}
             />
           }

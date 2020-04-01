@@ -1,5 +1,6 @@
 import React from 'react'
 import moment from 'moment'
+import { CONTENT_TYPES } from '../../consts'
 
 const timeFormat = {
   sameDay: '[Today,] HH:mm',
@@ -9,9 +10,32 @@ const timeFormat = {
 }
 
 export default function Message (props) {
-  const { data, isMine, startsSequence, endsSequence, showTimestamp } = props
+  let contentRender = null
+  const { message, isMine, startsSequence, endsSequence, showTimestamp } = props
+  const { timestamp, contentType, content, contentName } = message
 
-  const friendlyTimestamp = moment(data.timestamp).calendar(null, timeFormat)
+  const friendlyTimestamp = moment(timestamp).calendar(null, timeFormat)
+
+  switch (contentType) {
+    case CONTENT_TYPES.IMAGE:
+      // Render as image
+      const ext = contentName.split('.')[1]
+      const imgSrc = `data:image/${ext};base64, ${content}`
+      contentRender = (
+        <img className='bubble' title={friendlyTimestamp} src={imgSrc} />
+      )
+      break
+    case CONTENT_TYPES.FILE:
+      break
+    default:
+      // Render as text
+      contentRender = (
+        <div className='bubble' title={friendlyTimestamp}>
+          {content}
+        </div>
+      )
+  }
+
   return (
     <div
       className={[
@@ -23,11 +47,7 @@ export default function Message (props) {
     >
       {showTimestamp && <div className='timestamp'>{friendlyTimestamp}</div>}
 
-      <div className='bubble-container'>
-        <div className='bubble' title={friendlyTimestamp}>
-          {data.content}
-        </div>
-      </div>
+      <div className='bubble-container'>{contentRender}</div>
     </div>
   )
 }

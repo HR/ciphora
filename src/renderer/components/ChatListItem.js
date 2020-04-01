@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import shave from 'shave'
 import moment from 'moment'
-import { COMPOSE_CHAT_ID } from '../../consts'
+import { COMPOSE_CHAT_ID, CONTENT_TYPES } from '../../consts'
 
 const timeFormat = {
   sameDay: 'HH:mm',
@@ -27,7 +27,17 @@ export default function ChatListItem (props) {
   })
 
   const { name, lastMessage, active } = props
-  const content = lastMessage ? lastMessage.content : ''
+  let content = null
+  if (!lastMessage) {
+    content = ''
+  } else if (lastMessage.contentType === CONTENT_TYPES.TEXT) {
+    // Text so show
+    content = lastMessage.content
+  } else {
+    // File/image so show type
+    content = `[${lastMessage.contentType}]`
+  }
+
   const time = lastMessage
     ? moment(lastMessage.timestamp).calendar(null, timeFormat)
     : ''

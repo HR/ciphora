@@ -3,6 +3,7 @@ import Compose from './Compose'
 import Toolbar from './Toolbar'
 import ToolbarButton from './ToolbarButton'
 import Message from './Message'
+import { CONTENT_TYPES } from '../../consts'
 import moment from 'moment'
 
 export default function MessageList (props) {
@@ -78,7 +79,7 @@ export default function MessageList (props) {
           startsSequence={startsSequence}
           endsSequence={endsSequence}
           showTimestamp={showTimestamp}
-          data={current}
+          message={current}
         />
       )
     }
@@ -150,9 +151,17 @@ export default function MessageList (props) {
           // Clear message input
           setMessage('')
         })}
-        rightItems={[
-          <ToolbarButton key='image' icon='ion-ios-image' />,
-          <ToolbarButton key='file' icon='ion-ios-share' />
+        rightitems={[
+          <ToolbarButton
+            onClick={() => props.onSendFileClick(CONTENT_TYPES.IMAGE)}
+            key='image'
+            icon='ion-ios-image'
+          />,
+          <ToolbarButton
+            onClick={() => props.onSendFileClick(CONTENT_TYPES.FILE)}
+            key='file'
+            icon='ion-ios-share'
+          />
         ]}
       />
     </div>
