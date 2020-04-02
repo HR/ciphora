@@ -13,6 +13,7 @@
 
 .modal-cover.modal-cover-active {
   display: block;
+  z-index: 1024;
 }
 
 .modal-container {
@@ -92,7 +93,9 @@
   padding: 4px;
 }
 
-.modal-body textarea, .modal-body input, .modal-body select {
+.modal-body textarea,
+.modal-body input,
+.modal-body select {
   font-size: 0.9rem;
   width: 480px;
   background: var(--light-two);
@@ -113,7 +116,9 @@
   resize: none;
 }
 
-.dark .modal-body textarea, .dark .modal-body input, .modal-body select {
+.dark .modal-body textarea,
+.dark .modal-body input,
+.modal-body select {
   background: var(--dark-two);
   color: var(--dark-nine);
 }

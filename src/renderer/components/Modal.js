@@ -23,7 +23,10 @@ export default function Modal (props) {
         {!!props.action && <div className='modal-action'>{props.action}</div>}
       </div>
 
-      <div className={coverClass}></div>
+      <div
+        className={coverClass}
+        onClick={props.onClose ? props.onClose : undefined}
+      ></div>
     </div>
   )
 }
