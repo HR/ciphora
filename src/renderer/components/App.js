@@ -10,7 +10,7 @@ import { useNotifications } from '../lib/notifications'
 import { clone, friendlyError } from '../lib/util'
 import { COMPOSE_CHAT_ID, CONTENT_TYPES } from '../../consts'
 import { ipcRenderer, remote } from 'electron'
-import '../../../static/css/*.css'
+import '../../../static/scss/index.scss'
 
 if (module.hot) {
   module.hot.accept()

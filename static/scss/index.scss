@@ -1,6 +1,8 @@
+@import 'components/*';
+@import 'ionicons';
 
 :root {
-	--dark-one: #000;
+  --dark-one: #000;
   --dark-two: #191919;
   --dark-three: #111;
   --dark-four: #252525;
@@ -20,11 +22,11 @@
   --light-seven: #999;
   --light-eight: #888;
   --light-nine: #000000;
-	--light-blue: #0084ff;
+  --light-blue: #0084ff;
 
-	--text-danger: #fa3c4c;
-	--bg-danger: #dc3545;
-	--online-green: #01A452;
+  --text-danger: #fa3c4c;
+  --bg-danger: #dc3545;
+  --online-green: #01A452;
 }
 
 body {

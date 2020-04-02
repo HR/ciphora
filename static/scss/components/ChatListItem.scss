@@ -4,12 +4,14 @@
   padding: 10px;
 }
 
-.chat-list-item:hover, .chat-list-item-active {
+.chat-list-item:hover,
+.chat-list-item-active {
   background: var(--light-three);
   cursor: pointer;
 }
 
-.dark .chat-list-item:hover, .dark .chat-list-item-active {
+.dark .chat-list-item:hover,
+.dark .chat-list-item-active {
   background: var(--dark-three);
 }
 
@@ -25,11 +27,16 @@
   text-align: right;
 }
 
-.chat-info-right > .chat-delete {
+.chat-info-right>.chat-delete {
+  color: var(--light-eight);
   font-size: 16px;
 }
 
-.chat-info-right > .chat-delete:hover {
+.dark .chat-info-right>.chat-delete {
+  color: var(--dark-eight);
+}
+
+.chat-info-right>.chat-delete:hover {
   color: var(--bg-danger);
 }
 

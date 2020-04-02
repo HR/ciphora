@@ -91,11 +91,13 @@ export default function MessageList (props) {
     <Toolbar
       title={props.chat ? props.chat.name : ''}
       rightItems={
-        <ToolbarButton
-          key='info'
-          icon='ion-ios-information-circle-outline'
-          onClick={props.onInfoClick}
-        />
+        props.chat && (
+          <ToolbarButton
+            key='info'
+            icon='ion-ios-information-circle-outline'
+            onClick={props.onInfoClick}
+          />
+        )
       }
     />
   )

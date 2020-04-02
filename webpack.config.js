@@ -1,6 +1,7 @@
 const HtmlWebPackPlugin = require('html-webpack-plugin'),
   MiniCssExtractPlugin = require('mini-css-extract-plugin'),
-  path = require('path')
+  path = require('path'),
+  sassLoader = require('./scripts/sass-loader.js')
 
 module.exports = {
   entry: path.resolve(__dirname, 'src/renderer/index.js'),
@@ -11,17 +12,15 @@ module.exports = {
   },
   devtool: 'eval-cheap-source-map',
   module: {
-    rules: [{
-        test: /\.js$/,
-        use: ['import-glob'],
-        enforce: 'pre'
-      }, {
+    rules: [
+      {
         test: /\.(js|jsx)$/,
         exclude: /node_modules/,
         use: ['babel-loader']
-      }, {
-        test: /\.css$/i,
-        use: [MiniCssExtractPlugin.loader, 'css-loader']
+      },
+      {
+        test: /\.s[ac]ss$/i,
+        use: [MiniCssExtractPlugin.loader, 'css-loader', sassLoader]
       },
       {
         test: /\.html$/,
@@ -32,7 +31,7 @@ module.exports = {
       {
         test: /\.(woff|woff2|eot|ttf|otf)$/,
         use: {
-          loader: 'file-loader',
+          loader: 'file-loader'
         }
       }
     ]
@@ -51,4 +50,4 @@ module.exports = {
     hot: true,
     port: 9000
   }
-};
+}
