@@ -1,3 +1,6 @@
+# Ignore build folder
+app/
+
 # Logs
 logs
 *.log
