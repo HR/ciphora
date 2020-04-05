@@ -6,7 +6,9 @@ import { ipcRenderer } from 'electron'
 import { darkMode } from 'electron-util'
 
 if (darkMode.isEnabled) {
-  document.documentElement.classList.add('dark')
+  document.body.classList.add('theme-dark')
+} else {
+  document.body.classList.add('theme-light')
 }
 
 const app = ReactDOM.render(

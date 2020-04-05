@@ -1,45 +1,45 @@
-.toolbar {
-  display: flex;
-  align-items: center;
-  font-weight: 500;
-  position: sticky;
-  top: 0px;
-  border: none;
-  background-color: var(--light-five);
-  backdrop-filter: blur(20px);
-  z-index: 1000;
-}
+@import '../themes';
 
-.dark .toolbar {
-  background-color: var(--dark-five);
-}
+@include themify() {
+  .toolbar {
+    display: flex;
+    align-items: center;
+    font-weight: 500;
+    position: sticky;
+    top: 0px;
+    border: none;
+    background-color: themed('overlayBackgroundColor');
+    backdrop-filter: blur(20px);
+    z-index: 1000;
+  }
 
-.toolbar-title {
-  margin: 0;
-  font-size: 16px;
-  font-weight: 800;
-}
+  .toolbar-title {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 800;
+  }
 
-.left-items,
-.right-items {
-  flex: 1;
-  padding: 10px;
-  display: flex;
-}
+  .left-items,
+  .right-items {
+    flex: 1;
+    padding: 10px;
+    display: flex;
+  }
 
-.right-items {
-  flex-direction: row-reverse;
-}
+  .right-items {
+    flex-direction: row-reverse;
+  }
 
-.left-items .toolbar-button {
-  margin-right: 20px;
-}
+  .left-items .toolbar-button {
+    margin-right: 20px;
+  }
 
-.right-items .toolbar-button {
-  margin-left: 20px;
-}
+  .right-items .toolbar-button {
+    margin-left: 20px;
+  }
 
-.left-items .toolbar-button:last-child,
-.right-items .toolbar-button:last-child {
-  margin: 0;
+  .left-items .toolbar-button:last-child,
+  .right-items .toolbar-button:last-child {
+    margin: 0;
+  }
 }
