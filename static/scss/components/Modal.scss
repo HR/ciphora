@@ -7,7 +7,7 @@
     bottom: 0;
     left: 0;
     right: 0;
-    background: rgba(0, 0, 0, .6);
+    background: themed('overlayBackgroundColor');
     width: 100%;
     height: 100%;
     z-index: 50;
@@ -20,7 +20,6 @@
   }
 
   .modal-container {
-    --background: themed('backgroundColor');
     z-index: 1050;
     position: absolute;
     top: 50%;
@@ -28,7 +27,7 @@
     transform: translate(-50%, -50%);
     border: 1px solid themed('secondaryBackgroundColor');
     border-radius: 6px;
-    background: var(--background);
+    background: themed('backgroundColor');
     width: 550px;
     min-height: 350px;
     display: none;
@@ -76,7 +75,7 @@
     position: relative;
     top: -10px;
     padding: 0 16px;
-    background: var(--background);
+    background: themed('backgroundColor');
   }
 
   .modal-container .cancel {
