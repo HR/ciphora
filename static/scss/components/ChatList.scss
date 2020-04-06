@@ -1,4 +1,8 @@
-.chat-list {
-  display: flex;
-  flex-direction: column;
+@import '../themes';
+
+@include themify() {
+  .chat-list {
+    display: flex;
+    flex-direction: column;
+  }
 }

@@ -1,71 +1,31 @@
 @import 'components/*';
 @import 'ionicons';
+@import 'themes';
 
-:root {
-  --dark-one: #000;
-  --dark-two: #191919;
-  --dark-three: #111;
-  --dark-four: #252525;
-  --dark-five: rgba(0, 0, 0, 0.8);
-  --dark-six: #BBB;
-  --dark-seven: #666;
-  --dark-eight: #777;
-  --dark-nine: #FFF;
-  --dark-blue: #0061E6;
-
-  --light-one: #fff;
-  --light-one-half: #F5F5F5;
-  --light-two: #F6F6F6;
-  --light-three: #eeeef1;
-  --light-five: rgba(255, 255, 255, 0.8);
-  --light-six: #bbbbbf;
-  --light-seven: #999;
-  --light-eight: #888;
-  --light-nine: #000000;
-  --light-blue: #0084ff;
-
-  --text-danger: #fa3c4c;
-  --bg-danger: #dc3545;
-  --online-green: #01A452;
-}
-
-body {
+@include themify() {
   margin: 0;
   padding: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
     "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
     sans-serif;
   -webkit-font-smoothing: antialiased;
-  background: var(--light-three);
-  color: var(--light-nine);
-}
+  background: themed('backgroundColor');
+  color: themed('primaryForegroundColor');
+  
+  .danger {
+    background: themed('dangerBackgroundColor') !important;
+  }
 
-.dark body {
-  background: var(--dark-three);
-  color: var(--dark-nine);
-}
+  code {
+    font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+      monospace;
+  }
 
-.dark ::placeholder {
-  color: var(--dark-six);
-}
+  * {
+    -webkit-appearance: none;
+  }
 
-.dark input {
-  color: var(--dark-nine);
-}
-
-.danger {
-  background: var(--bg-danger) !important;
-}
-
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
-    monospace;
-}
-
-* {
-  -webkit-appearance: none;
-}
-
-*:focus {
-  outline: none;
+  *:focus {
+    outline: none;
+  }
 }

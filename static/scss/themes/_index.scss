@@ -1,0 +1,19 @@
+@import 'default';
+
+@mixin themify() {
+  .theme-light {
+    $internalTheme: map-get($theme, 'light') !global;
+    @content;
+    $internalTheme: null !global;
+  }
+
+  .theme-dark {
+    $internalTheme: map-get($theme, 'dark') !global;
+    @content;
+    $internalTheme: null !global;
+  }
+}
+
+@function themed($key: 'primaryColor') {
+  @return map-get($internalTheme, $key);
+}

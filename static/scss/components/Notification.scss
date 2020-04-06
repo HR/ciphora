@@ -1,41 +1,41 @@
-.notification-container {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-}
+@import '../themes';
 
-.notification {
-  margin: 0 auto;
-  margin-bottom: 15px;
-  width: 300px;
-  background: var(--light-two);
-  text-align: left;
-  font-size: 14px;
-  overflow: hidden;
-  border-radius: 0.4rem;
-  padding: 1rem;
-  font-weight: bold;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  justify-items: center;
-  box-shadow: rgba(0, 0, 0, 0.15) 0px 1px 10px 0px,
-    rgba(0, 0, 0, 0.1) 0px 6px 12px 0px,
-    rgba(0, 0, 0, 0.12) 0px 6px 15px -2px;
-}
+@include themify() {
+  .notification-container {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+  }
 
-.notification>.dismiss:hover {
-  opacity: 0.8;
-}
+  .notification {
+    margin: 0 auto;
+    margin-bottom: 15px;
+    width: 300px;
+    background: themed('secondaryBackgroundColor');
+    text-align: left;
+    font-size: 14px;
+    overflow: hidden;
+    border-radius: 0.4rem;
+    padding: 1rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    justify-items: center;
+    box-shadow: rgba(0, 0, 0, 0.15) 0px 1px 10px 0px,
+      rgba(0, 0, 0, 0.1) 0px 6px 12px 0px,
+      rgba(0, 0, 0, 0.12) 0px 6px 15px -2px;
+  }
 
-.notification>.dismiss {
-  cursor: pointer;
-}
+  .notification>.dismiss:hover {
+    opacity: 0.8;
+  }
 
-.dark .notification {
-  background: var(--dark-two);
-}
+  .notification>.dismiss {
+    cursor: pointer;
+  }
 
-.error.notification {
-  background: var(--bg-danger);
+  .error.notification {
+    background: themed('dangerBackgroundColor');
+  }
 }
