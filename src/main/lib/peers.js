@@ -4,13 +4,25 @@
  * Initiates and manages peer connections
  */
 
-const Peer = require('simple-peer'),
+const stream = require('stream'),
   EventEmitter = require('events'),
+  path = require('path'),
+  util = require('util'),
+  fs = require('fs'),
+  brake = require('brake'),
   wrtc = require('wrtc'),
-  moment = require('moment')
+  moment = require('moment'),
+  Peer = require('./simple-peer'),
+  { isString } = require('./util'),
+  { CONTENT_TYPES } = require('../../consts'),
+  { MEDIA_DIR } = require('../../config'),
+  // http://viblast.com/blog/2015/2/5/webrtc-data-channel-message-size/
+  MESSAGE_CHUNK_SIZE = 16 * 1024 // (16kb)
+const { mkdir } = fs.promises
+const pipeline = util.promisify(stream.pipeline)
 
 module.exports = class Peers extends EventEmitter {
-  constructor (signal) {
+  constructor (signal, crypto) {
     // Ensure singleton
     if (!!Peers.instance) {
       return Peers.instance
@@ -20,8 +32,9 @@ module.exports = class Peers extends EventEmitter {
     super()
 
     this._peers = {}
-    this._signal = signal
     this._requests = {}
+    this._signal = signal
+    this._crypto = crypto
 
     // Bindings
     this._addPeer = this._addPeer.bind(this)
@@ -107,7 +120,11 @@ module.exports = class Peers extends EventEmitter {
 
   // Initiates a connection with the given peer
   _addPeer (initiator, userId) {
-    const peer = (this._peers[userId] = new Peer({ initiator, wrtc: wrtc }))
+    const peer = (this._peers[userId] = new Peer({
+      initiator,
+      wrtc: wrtc,
+      reconnectTimer: 1000
+    }))
     const type = initiator ? 'Sender' : 'Receiver'
     peer.isConnected = false
 
@@ -120,8 +137,13 @@ module.exports = class Peers extends EventEmitter {
       console.log(type, 'got signal and sent')
     })
 
-    peer.on('connect', () => {
+    peer.on('connect', async () => {
       peer.isConnected = true
+      // Initialises a chat session
+      const keyMessage = await this._crypto.initSession(userId)
+      // Send the master secret public key with signature to the user
+      this._send('key', userId, keyMessage, false)
+
       this.emit('connect', userId, initiator)
     })
 
@@ -132,16 +154,54 @@ module.exports = class Peers extends EventEmitter {
 
     peer.on('error', err => this.emit('error', userId, err))
 
-    peer.on('data', binMessage => {
+    peer.on('data', async data => {
+      console.log('*******> Got data', data)
+      // Got new message
       // Try to deserialize message
       try {
-        const serializedMessage = binMessage.toString('utf8')
-        const { type, ...message } = JSON.parse(serializedMessage)
+        console.log('*******> Got message', data.toString('utf8'))
+        const { type, ...message } = JSON.parse(data.toString('utf8'))
         console.log(`Got ${type}:`, message)
-        this.emit(type, userId, message)
+        if (type === 'key') {
+          // When a new session key is received from a user
+          console.log('*******> Got key')
+          this._crypto.startSession(userId, message)
+          return
+        }
+
+        if (message.contentType === CONTENT_TYPES.TEXT) {
+          console.log('*******> Got Text')
+          const { decryptedMessage } = await this._crypto.decrypt(
+            userId,
+            message
+          )
+          this.emit(type, userId, decryptedMessage)
+          return
+        }
       } catch (e) {
-        this.emit('error', e)
+        console.error(e, '-> err')
+        // this.emit('error', e)
       }
+    })
+
+    peer.on('datachannel', async (datachannel, id) => {
+      console.log('>> Received new stream', id)
+      const { type, ...message } = JSON.parse(id)
+      let { decryptedMessage, contentDecipher } = await this._crypto.decrypt(
+        userId,
+        message,
+        true
+      )
+      const mediaDir = path.join(MEDIA_DIR, userId, message.contentType)
+      // Recursively make media directory
+      await mkdir(mediaDir, { recursive: true })
+      const contentPath = path.join(mediaDir, decryptedMessage.content)
+      console.log('Writing to', contentPath)
+      const contentWriteStream = fs.createWriteStream(contentPath)
+      // Stream content
+      await pipeline(datachannel, contentDecipher, contentWriteStream)
+      decryptedMessage.content = contentPath
+      this.emit(type, userId, decryptedMessage)
     })
   }
 
@@ -178,28 +238,47 @@ module.exports = class Peers extends EventEmitter {
   }
 
   // Sends a message to given peer
-  _send (type, receiverId, message) {
+  async _send (type, receiverId, message, encrypt, contentPath) {
     if (!this.isConnected(receiverId)) {
       return false
     }
-    // Serialize and send
+    const peer = this._peers[receiverId]
+
+    if (encrypt) {
+      // Encrypt message
+      var { encryptedMessage, contentCipher } = await this._crypto.encrypt(
+        receiverId,
+        message,
+        contentPath
+      )
+      message = encryptedMessage
+    }
+
+    // Serialize
     const serializedMessage = JSON.stringify({
       type,
       ...message
     })
-    const binMessage = Buffer.from(serializedMessage, 'utf8')
-    this._peers[receiverId].write(binMessage)
-    console.log(type, 'sent', message)
-    return true
-  }
 
-  // Sends own ephemeral public key to given peer
-  sendKey (...args) {
-    return this._send('key', ...args)
+    if (!contentPath) {
+      peer.write(serializedMessage)
+      console.log(type, 'sent', message)
+      return
+    }
+
+    console.log('Streaming message', message, contentPath)
+    const contentReadStream = fs.createReadStream(contentPath)
+    const sendStream = peer.createDataChannel(serializedMessage)
+    pipeline(
+      contentReadStream,
+      contentCipher,
+      brake(MESSAGE_CHUNK_SIZE, { period: 50 }),
+      sendStream
+    ).catch(err => console.error(err))
   }
 
   // Sends a chat message to given peer
-  sendMessage (...args) {
+  async sendMessage (...args) {
     return this._send('message', ...args)
   }
 }

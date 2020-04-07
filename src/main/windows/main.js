@@ -24,7 +24,8 @@ async function init () {
     frame: false,
     titleBarStyle: 'hiddenInset',
     webPreferences: {
-      nodeIntegration: true
+      nodeIntegration: true,
+      webSecurity: false
     }
   }))
 

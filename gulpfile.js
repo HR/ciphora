@@ -1,8 +1,12 @@
 const spawn = require('child_process').spawn
-const { watch, series } = require('gulp')
+const { watch } = require('gulp')
 var p
 
-const SRC_FILES = ['src/**/*.js', '!src/renderer/**/*.js']
+const SRC_FILES = [
+  './src/main/*.js',
+  './src/main/windows/*.js',
+  './src/main/lib/*.js'
+]
 const ELECTRON = __dirname + '/node_modules/.bin/electron'
 const DEBUG = false
 let args = ['.']

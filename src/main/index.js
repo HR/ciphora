@@ -1,7 +1,6 @@
 'use strict'
 
 const { app, Menu, ipcMain, clipboard } = require('electron'),
-  { readFile } = require('fs').promises,
   { basename } = require('path'),
   { is } = require('electron-util'),
   unhandled = require('electron-unhandled'),
@@ -66,7 +65,7 @@ app.on('activate', windows.main.activate)
   const state = new State(db)
   const chats = new Chats(db)
   const signal = new Signal()
-  const peers = new Peers(signal)
+  const peers = new Peers(signal, crypto)
 
   // TODO: Modularise all listeners
   console.log('\n\n\n**********************************************> New run\n')
@@ -117,17 +116,11 @@ app.on('activate', windows.main.activate)
   // When a new connection with a user is established
   peers.on('connect', async userId => {
     console.log('Connected with', userId)
-    // Initialises a chat session
-    const keyMessage = await crypto.initSession(userId)
-    // Send the master secret public key with signature to the user
-    peers.sendKey(userId, keyMessage)
     // Set user as online
     chats.setOnline(userId)
     // Update UI
     windows.main.send('update-chats', chats.getChats())
   })
-  // When a new session key is received from a user
-  peers.on('key', async (userId, key) => crypto.startSession(userId, key))
   // When a connection with a user is closed
   peers.on('disconnect', async userId => {
     console.log('Disconnected with', userId)
@@ -143,9 +136,7 @@ app.on('activate', windows.main.activate)
   // When a new message from a user is received
   peers.on('message', async (senderId, message) => {
     console.log('Got message', message)
-    const decryptedMessage = await crypto.decrypt(senderId, message)
-    if (!decryptedMessage) return
-    chats.addMessage(senderId, decryptedMessage)
+    chats.addMessage(senderId, message)
     windows.main.send('update-chats', chats.getChats())
   })
 
@@ -154,6 +145,7 @@ app.on('activate', windows.main.activate)
     'send-message',
     async (event, contentType, content, receiverId) => {
       // Construct message
+      let contentPath
       let message = {
         sender: userId,
         content,
@@ -161,29 +153,27 @@ app.on('activate', windows.main.activate)
         timestamp: new Date().toISOString()
       }
 
+      // Set the id of the message to its hash
+      message.id = crypto.hash(JSON.stringify(message))
+      console.log('Adding message', message)
+      // TODO: Copy media to media dir
+      chats.addMessage(receiverId, { ...message })
+      // Optimistically update UI
+      windows.main.send('update-chats', chats.getChats())
+
       if (
         contentType === CONTENT_TYPES.IMAGE ||
         contentType === CONTENT_TYPES.FILE
       ) {
-        let [contentPath] = content
-        // Attach file name
-        message.contentName = basename(contentPath)
-        // Set to the file's contents in base64
-        message.content = await readFile(contentPath, { encoding: 'base64' })
+        contentPath = content[0]
+        // Set to file name
+        message.content = basename(contentPath)
+        // Hash content for verification
+        message.contentHash = await crypto.hashFile(contentPath)
       }
-
-      console.log(message)
-      // Set the id of the message to its hash
-      message.id = crypto.hash(JSON.stringify(message))
-      console.log('Adding message', message)
-      chats.addMessage(receiverId, message)
-      // Optimistically update UI
-      windows.main.send('update-chats', chats.getChats())
       // TODO: Queue message if not connected / no session for later
       if (!peers.isConnected(receiverId)) return
-      const encryptedMessage = await crypto.encrypt(receiverId, message)
-      console.log('Sending message', encryptedMessage)
-      peers.sendMessage(receiverId, encryptedMessage)
+      peers.sendMessage(receiverId, message, true, contentPath)
     }
   )
   // When the user adds a new chat with a new recipient
