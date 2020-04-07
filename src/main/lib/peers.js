@@ -13,7 +13,7 @@ const stream = require('stream'),
   wrtc = require('wrtc'),
   moment = require('moment'),
   Peer = require('./simple-peer'),
-  { isString } = require('./util'),
+  Queue = require('./queue'),
   { CONTENT_TYPES } = require('../../consts'),
   { MEDIA_DIR } = require('../../config'),
   // http://viblast.com/blog/2015/2/5/webrtc-data-channel-message-size/
@@ -35,6 +35,7 @@ module.exports = class Peers extends EventEmitter {
     this._requests = {}
     this._signal = signal
     this._crypto = crypto
+    this._sendingQueue = new Queue()
 
     // Bindings
     this._addPeer = this._addPeer.bind(this)
@@ -42,6 +43,9 @@ module.exports = class Peers extends EventEmitter {
     this._onSignalAccept = this._onSignalAccept.bind(this)
     this._onSignal = this._onSignal.bind(this)
     this._onSignalReceiverOffline = this._onSignalReceiverOffline.bind(this)
+
+    // Add queue event listeners
+    this._sendingQueue.on('error', (id, error) => console.error(id, error))
 
     // Add signal event listeners
     this._signal.on('signal-request', this._onSignalRequest)
@@ -239,9 +243,8 @@ module.exports = class Peers extends EventEmitter {
 
   // Sends a message to given peer
   async _send (type, receiverId, message, encrypt, contentPath) {
-    if (!this.isConnected(receiverId)) {
-      return false
-    }
+    if (!this.isConnected(receiverId)) return false
+
     const peer = this._peers[receiverId]
 
     if (encrypt) {
@@ -269,16 +272,16 @@ module.exports = class Peers extends EventEmitter {
     console.log('Streaming message', message, contentPath)
     const contentReadStream = fs.createReadStream(contentPath)
     const sendStream = peer.createDataChannel(serializedMessage)
-    pipeline(
+    await pipeline(
       contentReadStream,
       contentCipher,
       brake(MESSAGE_CHUNK_SIZE, { period: 50 }),
       sendStream
-    ).catch(err => console.error(err))
+    )
   }
 
   // Sends a chat message to given peer
-  async sendMessage (...args) {
-    return this._send('message', ...args)
+  async sendMessage (id, ...args) {
+    this._sendingQueue.add(id, () => this._send('message', ...args))
   }
 }

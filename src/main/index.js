@@ -173,7 +173,7 @@ app.on('activate', windows.main.activate)
       }
       // TODO: Queue message if not connected / no session for later
       if (!peers.isConnected(receiverId)) return
-      peers.sendMessage(receiverId, message, true, contentPath)
+      peers.sendMessage(message.id, receiverId, message, true, contentPath)
     }
   )
   // When the user adds a new chat with a new recipient
