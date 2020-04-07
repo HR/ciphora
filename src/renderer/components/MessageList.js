@@ -13,11 +13,11 @@ export default function MessageList (props) {
 
   // Scrolls to the bottom
   function scrollToBottom () {
-    messagesEndRef.current.scrollIntoView({ behavior: 'smooth' })
+    messagesEndRef.current.scrollIntoView({ block: 'end', behavior: 'smooth' })
   }
 
   // Scroll to the bottom everytime a new message is sent to show it
-  useEffect(scrollToBottom)
+  useEffect(scrollToBottom, [props.chat])
 
   // Invokes the passed function (fn) when enter press detected
   function onEnterPress (fn) {
@@ -80,6 +80,7 @@ export default function MessageList (props) {
           endsSequence={endsSequence}
           showTimestamp={showTimestamp}
           message={current}
+          onLoad={scrollToBottom}
         />
       )
     }
@@ -140,7 +141,6 @@ export default function MessageList (props) {
       <div className='message-list-container'>
         {!props.composing && props.chat && renderMessages()}
       </div>
-      <div ref={messagesEndRef} />
 
       <Compose
         disabled={props.composing || !props.chat}
@@ -166,6 +166,7 @@ export default function MessageList (props) {
           />
         ]}
       />
+      <div ref={messagesEndRef} />
     </div>
   )
 }

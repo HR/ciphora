@@ -12,17 +12,23 @@ const timeFormat = {
 export default function Message (props) {
   let contentRender = null
   const { message, isMine, startsSequence, endsSequence, showTimestamp } = props
-  const { timestamp, contentType, content, contentName } = message
-
+  const { timestamp, contentType, content } = message
+  console.log(message)
   const friendlyTimestamp = moment(timestamp).calendar(null, timeFormat)
 
   switch (contentType) {
     case CONTENT_TYPES.IMAGE:
       // Render as image
-      const ext = contentName.split('.')[1]
-      const imgSrc = `data:image/${ext};base64, ${content}`
+      // const ext = content.split('.')[1]
+      // const imgSrc = `data:image/${ext};base64, ${content}`
+      const imgSrc = `file:///${content}`
       contentRender = (
-        <img className='bubble' title={friendlyTimestamp} src={imgSrc} />
+        <img
+          className='bubble'
+          onLoad={props.onLoad}
+          title={friendlyTimestamp}
+          src={imgSrc}
+        />
       )
       break
     case CONTENT_TYPES.FILE:
