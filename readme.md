@@ -62,7 +62,7 @@ $ git clone https://github.com/HR/ciphora-server.git
 Install deps for both repos
 
 ```
-$ yarn install
+$ yarn
 ```
 
 ### Run
