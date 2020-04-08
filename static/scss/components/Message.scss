@@ -67,6 +67,7 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    cursor: pointer;
   }
 
   .message .bubble-container .bubble.file > i {

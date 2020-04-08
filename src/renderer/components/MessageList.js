@@ -82,6 +82,7 @@ export default function MessageList (props) {
           showTimestamp={showTimestamp}
           message={current}
           onLoad={scrollToBottom}
+          onFileClick={props.onFileClick}
         />
       )
     }

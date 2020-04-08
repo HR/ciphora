@@ -9,7 +9,7 @@ import CreatePGPModal from './CreatePGPModal'
 import { useNotifications } from '../lib/notifications'
 import { clone, friendlyError } from '../lib/util'
 import { COMPOSE_CHAT_ID, CONTENT_TYPES } from '../../consts'
-import { ipcRenderer, remote } from 'electron'
+import { ipcRenderer, remote, shell } from 'electron'
 import '../../../static/scss/index.scss'
 
 if (module.hot) {
@@ -36,16 +36,17 @@ const CIPHORA_ID_REGEX = /^[0-9a-fA-F]{40}$/
 const WORDS_REGEX = /\S/
 const PUBLIC_KEY_REGEX = /-----BEGIN PGP PUBLIC KEY BLOCK-----(.|\n|\r|\r\n)+-----END PGP PUBLIC KEY BLOCK-----/
 const PRIVATE_KEY_REGEX = /-----BEGIN PGP PRIVATE KEY BLOCK-----(.|\n|\r|\r\n)+-----END PGP PRIVATE KEY BLOCK-----/m
-//
+// Open file dialog filters
 let FILTERS = {}
 FILTERS[CONTENT_TYPES.IMAGE] = [
   {
     name: 'Images',
+    // Supported by 'img' tag
     extensions: ['jpg', 'jpeg', 'svg', 'png', 'apng', 'gif']
   }
 ]
 FILTERS[CONTENT_TYPES.FILE] = [{ name: 'All Files', extensions: ['*'] }]
-
+// Root component
 export default class App extends React.Component {
   static contextType = useNotifications(true)
   constructor (props) {
@@ -57,6 +58,7 @@ export default class App extends React.Component {
       ...clone(initModalsState)
     }
 
+    // Bindings
     this.closeModal = this.closeModal.bind(this)
     this.openModal = this.openModal.bind(this)
     this.importPGPHandler = this.importPGPHandler.bind(this)
@@ -66,22 +68,24 @@ export default class App extends React.Component {
     this.activateChat = this.activateChat.bind(this)
     this.composeMessage = this.composeMessage.bind(this)
     this.updateChats = this.updateChats.bind(this)
-    this.handleModalError = this.handleModalError.bind(this)
+    this.showModalError = this.showModalError.bind(this)
     this.copyPGPHandler = this.copyPGPHandler.bind(this)
     this.createComposeChat = this.createComposeChat.bind(this)
     this.deleteComposeChat = this.deleteComposeChat.bind(this)
     this.sendFileHandler = this.sendFileHandler.bind(this)
+    this.openFileHandler = this.openFileHandler.bind(this)
 
     // Add event listeners
     ipcRenderer.on('log', (event, data) => console.log(data))
     ipcRenderer.on('open-modal', (event, modal) => this.openModal(modal))
+    ipcRenderer.on('modal-error', (event, err) => this.showModalError(err))
     ipcRenderer.on('update-chats', this.updateChats)
-    ipcRenderer.on('modal-error', this.handleModalError)
   }
 
   componentDidMount () {
     // Init notifications via the context
     notifications = this.context
+    // Let main process show notifications
     ipcRenderer.on('notify', (event, ...args) => notifications.show(...args))
   }
 
@@ -109,7 +113,7 @@ export default class App extends React.Component {
     this.setState(newModalState)
   }
 
-  handleModalError (event, text) {
+  showModalError (text) {
     this.setState({
       modalMessage: {
         text,
@@ -123,13 +127,9 @@ export default class App extends React.Component {
     let pub = keys.match(PUBLIC_KEY_REGEX)
     let priv = keys.match(PRIVATE_KEY_REGEX)
 
+    // Ensure valid PGP public key and private key passed
     if (!pub || !priv) {
-      this.setState({
-        modalMessage: {
-          text: 'Missing or invalid details',
-          error: true
-        }
-      })
+      this.showModalError('Missing or invalid details')
       return
     }
 
@@ -140,25 +140,13 @@ export default class App extends React.Component {
         privateKeyArmored: priv[0]
       })
       .then(() => this.closeModal())
-      .catch(error => {
-        this.setState({
-          modalMessage: {
-            text: friendlyError(error),
-            error: true
-          }
-        })
-      })
+      .catch(error => this.showModalError(friendlyError(error)))
   }
 
   createPGPHandler (params) {
     // Check if all required params supplied
     if (!params.name || !params.passphrase || !params.algo) {
-      this.setState({
-        modalMessage: {
-          text: 'Missing details',
-          error: true
-        }
-      })
+      this.showModalError('Missing details')
       return
     }
     // Remove email if not supplied
@@ -182,14 +170,7 @@ export default class App extends React.Component {
           }
         })
       })
-      .catch(error => {
-        this.setState({
-          modalMessage: {
-            text: friendlyError(error),
-            error: true
-          }
-        })
-      })
+      .catch(error => this.showModalError(friendlyError(error)))
   }
 
   createComposeChat () {
@@ -301,7 +282,11 @@ export default class App extends React.Component {
     )
   }
 
-  // TODO: consistenly use 'compose' chat and message naming
+  openFileHandler (filePath) {
+    // Open file
+    shell.openItem(filePath)
+  }
+
   render () {
     const activeChat =
       this.state.activeChatId && this.state.chats[this.state.activeChatId]
@@ -350,6 +335,7 @@ export default class App extends React.Component {
               onComposeMessage={this.composeMessage}
               onSendFileClick={this.sendFileHandler}
               onInfoClick={() => this.openModal('chatInfo')}
+              onFileClick={this.openFileHandler}
             />
           }
         />

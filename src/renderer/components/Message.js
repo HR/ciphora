@@ -1,6 +1,6 @@
 import React from 'react'
-import moment from 'moment'
 import { basename } from 'path'
+import moment from 'moment'
 import { CONTENT_TYPES } from '../../consts'
 
 const timeFormat = {
@@ -34,7 +34,11 @@ export default function Message (props) {
       const fileName = basename(content)
       const title = `${fileName} - ${friendlyTimestamp}`
       contentRender = (
-        <div className='bubble file' title={title}>
+        <div
+          className='bubble file'
+          title={title}
+          onClick={() => props.onFileClick(content)}
+        >
           <i className='ion-ios-document' />
           <br />
           {fileName}

@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { basename } from 'path'
 import moment from 'moment'
 import { COMPOSE_CHAT_ID, CONTENT_TYPES } from '../../consts'
 
@@ -29,8 +30,8 @@ export default function ChatListItem (props) {
     // Text so show
     content = lastMessage.content
   } else {
-    // File/image so show type
-    content = `[${lastMessage.contentType}]`
+    // File/image so show file name
+    content = basename(lastMessage.content)
   }
 
   const time = lastMessage
