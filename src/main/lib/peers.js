@@ -17,7 +17,8 @@ const stream = require('stream'),
   { CONTENT_TYPES } = require('../../consts'),
   { MEDIA_DIR } = require('../../config'),
   // http://viblast.com/blog/2015/2/5/webrtc-data-channel-message-size/
-  MESSAGE_CHUNK_SIZE = 16 * 1024 // (16kb)
+  MESSAGE_CHUNK_SIZE = 16 * 1024, // (16kb)
+  MESSAGE_STREAM_RATE = 50 // ms
 const { mkdir } = fs.promises
 const pipeline = util.promisify(stream.pipeline)
 
@@ -115,7 +116,7 @@ module.exports = class Peers extends EventEmitter {
     }
   }
 
-  // Removes given peer
+  // Removes given peer by id
   _removePeer (id) {
     if (this._peers[id]) {
       this._peers[id].destroy()
@@ -123,7 +124,7 @@ module.exports = class Peers extends EventEmitter {
     }
   }
 
-  // Initiates a connection with the given peer
+  // Initiates a connection with the given peer and sets up communication
   _addPeer (initiator, userId) {
     const peer = (this._peers[userId] = new Peer({
       initiator,
@@ -172,8 +173,8 @@ module.exports = class Peers extends EventEmitter {
     )
   }
 
+  // Handles new messages
   async _onMessage (userId, data) {
-    // Got new message
     // Try to deserialize message
     try {
       console.log('*******> Got message', data)
@@ -198,7 +199,8 @@ module.exports = class Peers extends EventEmitter {
     }
   }
 
-  async _onDataChannel (userId, datachannel, id) {
+  // Handles new data channels (file streams)
+  async _onDataChannel (userId, receivingStream, id) {
     console.log('>> Received new stream', id)
     const { type, ...message } = JSON.parse(id)
     let { decryptedMessage, contentDecipher } = await this._crypto.decrypt(
@@ -213,7 +215,7 @@ module.exports = class Peers extends EventEmitter {
     console.log('Writing to', contentPath)
     const contentWriteStream = fs.createWriteStream(contentPath)
     // Stream content
-    await pipeline(datachannel, contentDecipher, contentWriteStream)
+    await pipeline(receivingStream, contentDecipher, contentWriteStream)
     decryptedMessage.content = contentPath
     this.emit(type, userId, decryptedMessage)
   }
@@ -280,12 +282,12 @@ module.exports = class Peers extends EventEmitter {
 
     console.log('Streaming message', message, contentPath)
     const contentReadStream = fs.createReadStream(contentPath)
-    const sendStream = peer.createDataChannel(serializedMessage)
+    const sendingStream = peer.createDataChannel(serializedMessage)
     await pipeline(
       contentReadStream,
       contentCipher,
-      brake(MESSAGE_CHUNK_SIZE, { period: 50 }),
-      sendStream
+      brake(MESSAGE_CHUNK_SIZE, { period: MESSAGE_STREAM_RATE }),
+      sendingStream
     )
   }
 

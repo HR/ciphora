@@ -163,7 +163,7 @@ export default function MessageList (props) {
           <ToolbarButton
             onClick={() => props.onSendFileClick(CONTENT_TYPES.FILE)}
             key='file'
-            icon='ion-ios-share'
+            icon='ion-ios-document'
           />
         ]}
       />

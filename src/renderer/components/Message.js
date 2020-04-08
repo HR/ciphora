@@ -1,5 +1,6 @@
 import React from 'react'
 import moment from 'moment'
+import { basename } from 'path'
 import { CONTENT_TYPES } from '../../consts'
 
 const timeFormat = {
@@ -13,14 +14,11 @@ export default function Message (props) {
   let contentRender = null
   const { message, isMine, startsSequence, endsSequence, showTimestamp } = props
   const { timestamp, contentType, content } = message
-  console.log(message)
   const friendlyTimestamp = moment(timestamp).calendar(null, timeFormat)
 
   switch (contentType) {
     case CONTENT_TYPES.IMAGE:
       // Render as image
-      // const ext = content.split('.')[1]
-      // const imgSrc = `data:image/${ext};base64, ${content}`
       const imgSrc = `file:///${content}`
       contentRender = (
         <img
@@ -32,6 +30,13 @@ export default function Message (props) {
       )
       break
     case CONTENT_TYPES.FILE:
+      // Render as file
+      const fileName = basename(content)
+      contentRender = (
+        <div className='bubble file' title={friendlyTimestamp}>
+          <i className='ion-ios-document' /> {fileName}
+        </div>
+      )
       break
     default:
       // Render as text
