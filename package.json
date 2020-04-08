@@ -43,8 +43,6 @@
     "openpgp": "^4.10.1",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
-    "shave": "^2.5.8",
-    "simple-peer": "^9.6.2",
     "tweetnacl": "^1.0.3",
     "update-electron-app": "^1.5.0",
     "wrtc": "^0.4.4",

@@ -293,7 +293,12 @@ export default class App extends React.Component {
     // Ignore if user cancelled
     if (canceled || !filePaths) return
     console.log(filters, filePaths)
-    ipcRenderer.send('send-message', type, filePaths, this.state.activeChatId)
+    ipcRenderer.send(
+      'send-message',
+      type,
+      filePaths[0],
+      this.state.activeChatId
+    )
   }
 
   // TODO: consistenly use 'compose' chat and message naming

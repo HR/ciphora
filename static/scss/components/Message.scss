@@ -58,6 +58,21 @@
     border-bottom-right-radius: 20px;
   }
 
+  .message .bubble-container .bubble.file {
+    background: none !important;
+    border: 2px solid themed('secondaryBackgroundColor');
+    padding: 20px;
+    text-align: center;
+    width: 130px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .message .bubble-container .bubble.file > i {
+    font-size: 35px;
+  }
+
   .message .bubble-container img.bubble {
     padding: 0px !important;
     object-fit: contain;

@@ -32,9 +32,12 @@ export default function Message (props) {
     case CONTENT_TYPES.FILE:
       // Render as file
       const fileName = basename(content)
+      const title = `${fileName} - ${friendlyTimestamp}`
       contentRender = (
-        <div className='bubble file' title={friendlyTimestamp}>
-          <i className='ion-ios-document' /> {fileName}
+        <div className='bubble file' title={title}>
+          <i className='ion-ios-document' />
+          <br />
+          {fileName}
         </div>
       )
       break

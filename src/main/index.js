@@ -165,7 +165,7 @@ app.on('activate', windows.main.activate)
         contentType === CONTENT_TYPES.IMAGE ||
         contentType === CONTENT_TYPES.FILE
       ) {
-        contentPath = content[0]
+        contentPath = content
         // Set to file name
         message.content = basename(contentPath)
         // Hash content for verification

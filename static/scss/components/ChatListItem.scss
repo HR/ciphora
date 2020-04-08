@@ -21,16 +21,24 @@
     align-items: center;
   }
 
+  .chat-info,
+  .chat-info-left,
+  .chat-info-left * {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
   .chat-info-right {
     text-align: right;
   }
 
-  .chat-info-right>.chat-delete {
+  .chat-info-right > .chat-delete {
     color: themed('secondaryForegroundColor');
     font-size: 16px;
   }
 
-  .chat-info-right>.chat-delete:hover {
+  .chat-info-right > .chat-delete:hover {
     color: themed('dangerBackgroundColor');
   }
 

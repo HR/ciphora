@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from 'react'
-import shave from 'shave'
+import React, { useState } from 'react'
 import moment from 'moment'
 import { COMPOSE_CHAT_ID, CONTENT_TYPES } from '../../consts'
 
@@ -21,13 +20,9 @@ function initialsise (name) {
 
 export default function ChatListItem (props) {
   const [deleteOpacity, setDeleteOpacity] = useState(0)
-
-  useEffect(() => {
-    shave('.chat-snippet', 20)
-  })
-
   const { name, lastMessage, active } = props
   let content = null
+
   if (!lastMessage) {
     content = ''
   } else if (lastMessage.contentType === CONTENT_TYPES.TEXT) {
