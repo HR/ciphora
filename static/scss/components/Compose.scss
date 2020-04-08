@@ -5,10 +5,9 @@
     padding: 6px 15px;
     display: flex;
     align-items: center;
-    border-top: 1px solid themed('backgroundColor');
+    border-top: 1px solid themed('secondaryBackgroundColor');
     position: sticky;
     bottom: 0px;
-    border: none;
     background-color: themed('overlayBackgroundColor');
     backdrop-filter: blur(20px);
   }
@@ -36,17 +35,17 @@
     align-items: center;
   }
 
-  .compose-chat>span {
+  .compose-chat > span {
     opacity: 0.5;
     margin: 5px;
   }
 
-  .compose-chat>.compose-input {
+  .compose-chat > .compose-input {
     height: inherit !important;
     padding: 5px;
   }
 
-  .compose-chat>.compose-input::placeholder {
+  .compose-chat > .compose-input::placeholder {
     font-size: 16px;
   }
 }
