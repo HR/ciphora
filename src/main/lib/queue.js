@@ -14,6 +14,7 @@ module.exports = class Queue extends EventEmitter {
     this._pendingCount = 0
     this._processing = -1
     this._timeout = timeout
+    // this._responseTimeout = responseTimeout
     this._idle = true
   }
 
@@ -24,6 +25,10 @@ module.exports = class Queue extends EventEmitter {
     this._idle = false
     console.log(this._queue, this._processing, this._pendingCount)
     this._pendingCount--
+    if (this._processing > 0) {
+      const { removeWhenDone } = this._queue[this._processing]
+      if (removeWhenDone) this._remove(this._processing)
+    }
     this._queue[++this._processing].run()
   }
 
@@ -31,16 +36,26 @@ module.exports = class Queue extends EventEmitter {
     this.emit('error', id, error)
   }
 
-  // Remove task by id
-  remove (id) {
-    const index = this._queue.findIndex(task => task.id === id)
-    if (index < 0) return false
+  _remove (index) {
     // clearTimeout(this._queue[index].timer)
     return delete this._queue[index]
   }
 
+  // Remove task by id
+  remove (id) {
+    const index = this._queue.findIndex(task => task.id === id)
+    if (index < 0) return false
+    return this._remove(index)
+  }
+
   // Add task by id
-  add (id, fn) {
+  // TODO: Add timeout interval for task hangup
+  add (fn, id) {
+    let removeWhenDone = false
+    if (!id) {
+      // If an id not passed then remove when done
+      removeWhenDone = true
+    }
     let timer
     const run = async () => {
       console.log('Running task', id)
@@ -60,12 +75,12 @@ module.exports = class Queue extends EventEmitter {
       this._next()
     }
 
-    this._queue.push({ id, run, timer })
+    this._queue.push({ id, run, timer, removeWhenDone })
     this._pendingCount++
 
     if (this._idle) {
       // Start processing
-      console.log('Idle, start')
+      console.log('Idle, start', id)
       this._next()
     }
   }

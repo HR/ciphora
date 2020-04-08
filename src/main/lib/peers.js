@@ -36,6 +36,7 @@ module.exports = class Peers extends EventEmitter {
     this._signal = signal
     this._crypto = crypto
     this._sendingQueue = new Queue()
+    this._receivingQueue = new Queue()
 
     // Bindings
     this._addPeer = this._addPeer.bind(this)
@@ -158,55 +159,63 @@ module.exports = class Peers extends EventEmitter {
 
     peer.on('error', err => this.emit('error', userId, err))
 
-    peer.on('data', async data => {
-      console.log('*******> Got data', data)
-      // Got new message
-      // Try to deserialize message
-      try {
-        console.log('*******> Got message', data.toString('utf8'))
-        const { type, ...message } = JSON.parse(data.toString('utf8'))
-        console.log(`Got ${type}:`, message)
-        if (type === 'key') {
-          // When a new session key is received from a user
-          console.log('*******> Got key')
-          this._crypto.startSession(userId, message)
-          return
-        }
-
-        if (message.contentType === CONTENT_TYPES.TEXT) {
-          console.log('*******> Got Text')
-          const { decryptedMessage } = await this._crypto.decrypt(
-            userId,
-            message
-          )
-          this.emit(type, userId, decryptedMessage)
-          return
-        }
-      } catch (e) {
-        console.error(e, '-> err')
-        // this.emit('error', e)
-      }
-    })
-
-    peer.on('datachannel', async (datachannel, id) => {
-      console.log('>> Received new stream', id)
-      const { type, ...message } = JSON.parse(id)
-      let { decryptedMessage, contentDecipher } = await this._crypto.decrypt(
-        userId,
-        message,
-        true
+    peer.on('data', data =>
+      this._receivingQueue.add(() =>
+        this._onMessage(userId, data.toString('utf8'))
       )
-      const mediaDir = path.join(MEDIA_DIR, userId, message.contentType)
-      // Recursively make media directory
-      await mkdir(mediaDir, { recursive: true })
-      const contentPath = path.join(mediaDir, decryptedMessage.content)
-      console.log('Writing to', contentPath)
-      const contentWriteStream = fs.createWriteStream(contentPath)
-      // Stream content
-      await pipeline(datachannel, contentDecipher, contentWriteStream)
-      decryptedMessage.content = contentPath
-      this.emit(type, userId, decryptedMessage)
-    })
+    )
+
+    peer.on('datachannel', (datachannel, id) =>
+      this._receivingQueue.add(() =>
+        this._onDataChannel(userId, datachannel, id)
+      )
+    )
+  }
+
+  async _onMessage (userId, data) {
+    // Got new message
+    // Try to deserialize message
+    try {
+      console.log('*******> Got message', data)
+      const { type, ...message } = JSON.parse(data)
+      console.log(`Got ${type}:`, message)
+      if (type === 'key') {
+        // When a new session key is received from a user
+        console.log('*******> Got key')
+        this._crypto.startSession(userId, message)
+        return
+      }
+
+      if (message.contentType === CONTENT_TYPES.TEXT) {
+        console.log('*******> Got Text')
+        const { decryptedMessage } = await this._crypto.decrypt(userId, message)
+        this.emit(type, userId, decryptedMessage)
+        return
+      }
+    } catch (e) {
+      console.error(e, '-> err')
+      // this.emit('error', e)
+    }
+  }
+
+  async _onDataChannel (userId, datachannel, id) {
+    console.log('>> Received new stream', id)
+    const { type, ...message } = JSON.parse(id)
+    let { decryptedMessage, contentDecipher } = await this._crypto.decrypt(
+      userId,
+      message,
+      true
+    )
+    const mediaDir = path.join(MEDIA_DIR, userId, message.contentType)
+    // Recursively make media directory
+    await mkdir(mediaDir, { recursive: true })
+    const contentPath = path.join(mediaDir, decryptedMessage.content)
+    console.log('Writing to', contentPath)
+    const contentWriteStream = fs.createWriteStream(contentPath)
+    // Stream content
+    await pipeline(datachannel, contentDecipher, contentWriteStream)
+    decryptedMessage.content = contentPath
+    this.emit(type, userId, decryptedMessage)
   }
 
   // Adds sender to initiate a connection with receiving peer
@@ -282,6 +291,6 @@ module.exports = class Peers extends EventEmitter {
 
   // Sends a chat message to given peer
   async sendMessage (id, ...args) {
-    this._sendingQueue.add(id, () => this._send('message', ...args))
+    this._sendingQueue.add(() => this._send('message', ...args), id)
   }
 }
