@@ -13,6 +13,7 @@ export default function MessageList (props) {
 
   // Scrolls to the bottom
   function scrollToBottom () {
+    console.log('Scrolling to bottom')
     messagesEndRef.current.scrollIntoView({ block: 'end', behavior: 'smooth' })
   }
 
@@ -162,7 +163,7 @@ export default function MessageList (props) {
           <ToolbarButton
             onClick={() => props.onSendFileClick(CONTENT_TYPES.FILE)}
             key='file'
-            icon='ion-ios-share'
+            icon='ion-ios-document'
           />
         ]}
       />
