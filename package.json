@@ -10,7 +10,7 @@
   "author": {
     "name": "Habib Rehman",
     "email": "h@rehman.email",
-    "url": "github.com/HR"
+    "url": "https://github.com/HR"
   },
   "main": "./src/main/index.js",
   "scripts": {
