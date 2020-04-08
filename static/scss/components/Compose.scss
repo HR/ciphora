@@ -1,53 +1,52 @@
-.compose {
-  padding: 6px 15px;
-  display: flex;
-  align-items: center;
-  border-top: 1px solid var(--light-three);
-  position: sticky;
-  bottom: 0px;
-  border: none;
-  background-color: var(--light-five);
-  backdrop-filter: blur(20px);
-}
+@import '../themes';
 
-.dark .compose {
-  background-color: var(--dark-five);
-  border-top: 1px solid var(--dark-three);
-}
+@include themify() {
+  .compose {
+    padding: 6px 15px;
+    display: flex;
+    align-items: center;
+    border-top: 1px solid themed('backgroundColor');
+    position: sticky;
+    bottom: 0px;
+    border: none;
+    background-color: themed('overlayBackgroundColor');
+    backdrop-filter: blur(20px);
+  }
 
-.compose-input {
-  flex: 1;
-  border: none;
-  font-size: 14px;
-  height: 40px;
-  background: none;
-}
+  .compose-input {
+    flex: 1;
+    border: none;
+    font-size: 14px;
+    height: 40px;
+    background: none;
+  }
 
-.compose-input::placeholder {
-  opacity: 0.3;
-}
+  .compose-input::placeholder {
+    opacity: 0.3;
+  }
 
-.compose .toolbar-button {
-  margin: 0 10px;
-}
+  .compose .toolbar-button {
+    margin: 0 10px;
+  }
 
-.compose-chat {
-  font-size: 16px;
-  flex: 1 1 auto;
-  display: flex;
-  align-items: center;
-}
+  .compose-chat {
+    font-size: 16px;
+    flex: 1 1 auto;
+    display: flex;
+    align-items: center;
+  }
 
-.compose-chat>span {
-  opacity: 0.5;
-  margin: 5px;
-}
+  .compose-chat>span {
+    opacity: 0.5;
+    margin: 5px;
+  }
 
-.compose-chat>.compose-input {
-  height: inherit !important;
-  padding: 5px;
-}
+  .compose-chat>.compose-input {
+    height: inherit !important;
+    padding: 5px;
+  }
 
-.compose-chat>.compose-input::placeholder {
-  font-size: 16px;
+  .compose-chat>.compose-input::placeholder {
+    font-size: 16px;
+  }
 }

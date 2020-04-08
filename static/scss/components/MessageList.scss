@@ -1,10 +1,14 @@
-.message-list {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
+@import "../themes";
 
-.message-list-container {
-  flex: 1 1 auto;
-  padding: 10px;
+@include themify() {
+  .message-list {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .message-list-container {
+    flex: 1 1 auto;
+    padding: 10px;
+  }
 }
