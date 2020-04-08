@@ -5,6 +5,7 @@
  */
 
 const crypto = require('crypto'),
+  fs = require('fs'),
   keytar = require('keytar'),
   pgp = require('openpgp'),
   hkdf = require('futoin-hkdf'),
@@ -257,6 +258,19 @@ module.exports = class Crypto {
       .digest(enc)
   }
 
+  // Returns a hash digest of the given file
+  hashFile (path, enc = 'hex', alg = 'sha256') {
+    return new Promise((resolve, reject) =>
+      fs
+        .createReadStream(path)
+        .on('error', reject)
+        .pipe(crypto.createHash(alg).setEncoding(enc))
+        .once('finish', function () {
+          resolve(this.read())
+        })
+    )
+  }
+
   // Hash Key Derivation Function (based on HMAC)
   _HKDF (input, salt, info, length = RATCHET_KEYS_LEN) {
     // input = input instanceof Uint8Array ? Buffer.from(input) : input
@@ -410,7 +424,7 @@ module.exports = class Crypto {
   }
 
   // Encrypts a message
-  async encrypt (id, message) {
+  async encrypt (id, message, isFile) {
     let session = this._chatKeys[id].session
     let ratchet = session.currentRatchet
     let sendingChain = session.sending[ratchet.sendingKeys.publicKey]
@@ -431,11 +445,12 @@ module.exports = class Crypto {
     )
     const { counter } = sendingChain.chain
     // Encrypt message contents
-    const cipher = crypto.createCipheriv(CIPHER, encryptKey, iv)
-    let content = cipher.update(message.content, 'utf8', 'hex')
-    content += cipher.final('hex')
+    const messageCipher = crypto.createCipheriv(CIPHER, encryptKey, iv)
+    let content = messageCipher.update(message.content, 'utf8', 'hex')
+    content += messageCipher.final('hex')
+
     // Construct full message
-    let fullMessage = {
+    let encryptedMessage = {
       ...message,
       publicKey,
       previousCounter,
@@ -443,13 +458,21 @@ module.exports = class Crypto {
       content
     }
     // Sign message with PGP
-    fullMessage.signature = await this.sign(JSON.stringify(fullMessage))
+    encryptedMessage.signature = await this.sign(
+      JSON.stringify(encryptedMessage)
+    )
 
-    return fullMessage
+    if (isFile) {
+      // Return cipher
+      const contentCipher = crypto.createCipheriv(CIPHER, encryptKey, iv)
+      return { encryptedMessage, contentCipher }
+    }
+
+    return { encryptedMessage }
   }
 
   // Decrypts a message
-  async decrypt (id, signedMessage) {
+  async decrypt (id, signedMessage, isFile) {
     const { signature, ...fullMessage } = signedMessage
     const sigValid = await this.verify(
       id,
@@ -477,10 +500,19 @@ module.exports = class Crypto {
       iv.toString('hex')
     )
     // Decrypt the message contents
-    const decipher = crypto.createDecipheriv(CIPHER, decryptKey, iv)
-    let content = decipher.update(message.content, 'hex', 'utf8')
-    content += decipher.final('utf8')
+    const messageDecipher = crypto.createDecipheriv(CIPHER, decryptKey, iv)
+    let content = messageDecipher.update(message.content, 'hex', 'utf8')
+    content += messageDecipher.final('utf8')
     console.log('--> Decrypted content', content)
-    return { ...message, content }
+
+    const decryptedMessage = { ...message, content }
+
+    if (isFile) {
+      // Return Decipher
+      const contentDecipher = crypto.createDecipheriv(CIPHER, decryptKey, iv)
+      return { decryptedMessage, contentDecipher }
+    }
+
+    return { decryptedMessage }
   }
 }

@@ -29,6 +29,7 @@
     "release": "np"
   },
   "dependencies": {
+    "brake": "^1.0.1",
     "electron-context-menu": "^0.16.0",
     "electron-debug": "^3.0.1",
     "electron-unhandled": "^3.0.2",
