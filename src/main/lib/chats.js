@@ -58,8 +58,13 @@ module.exports = class Chats {
   }
 
   // Gets the chats
-  getChats () {
+  getAll () {
     return this._chats
+  }
+
+  // Checks if any chats exist
+  exist () {
+    return Object.keys(this._chats).length > 0
   }
 
   // Checks if a chat exists

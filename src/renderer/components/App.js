@@ -12,10 +12,6 @@ import { COMPOSE_CHAT_ID, CONTENT_TYPES } from '../../consts'
 import { ipcRenderer, remote, shell } from 'electron'
 import '../../../static/scss/index.scss'
 
-if (module.hot) {
-  module.hot.accept()
-}
-
 const { dialog } = remote
 // Notification ref
 let notifications = null
@@ -87,6 +83,7 @@ export default class App extends React.Component {
     notifications = this.context
     // Let main process show notifications
     ipcRenderer.on('notify', (event, ...args) => notifications.show(...args))
+    ipcRenderer.send('get-chats')
   }
 
   updateChats (event, chats, activeChatId, clearState) {

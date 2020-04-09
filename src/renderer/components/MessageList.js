@@ -13,7 +13,6 @@ export default function MessageList (props) {
 
   // Scrolls to the bottom
   function scrollToBottom () {
-    console.log('Scrolling to bottom')
     messagesEndRef.current.scrollIntoView({ block: 'end', behavior: 'smooth' })
   }
 

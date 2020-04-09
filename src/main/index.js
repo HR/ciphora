@@ -79,7 +79,7 @@ app.on('activate', windows.main.activate)
       // Add chat if not already added
       await chats.add(id, publicKeyArmored, address)
       await crypto.addKey(id, publicKeyArmored)
-      windows.main.send('update-chats', chats.getChats(), null)
+      windows.main.send('update-chats', chats.getAll(), null)
     }
     // Accept chat request by default
     signal.send('chat-accept', {
@@ -96,7 +96,7 @@ app.on('activate', windows.main.activate)
     await chats.add(senderId, senderPublicKey, address)
     await crypto.addKey(senderId, senderPublicKey)
     // Update UI
-    windows.main.send('update-chats', chats.getChats(), senderId, true)
+    windows.main.send('update-chats', chats.getAll(), senderId, true)
     // Establish a connection
     peers.connect(senderId)
   })
@@ -119,14 +119,14 @@ app.on('activate', windows.main.activate)
     // Set user as online
     chats.setOnline(userId)
     // Update UI
-    windows.main.send('update-chats', chats.getChats())
+    windows.main.send('update-chats', chats.getAll())
   })
   // When a connection with a user is closed
   peers.on('disconnect', async userId => {
     console.log('Disconnected with', userId)
     chats.setOffline(userId)
     // Update UI
-    windows.main.send('update-chats', chats.getChats())
+    windows.main.send('update-chats', chats.getAll())
   })
   // When a connection error with a user occurs
   peers.on('error', (userId, err) => {
@@ -137,7 +137,7 @@ app.on('activate', windows.main.activate)
   peers.on('message', async (senderId, message) => {
     console.log('Got message', message)
     chats.addMessage(senderId, message)
-    windows.main.send('update-chats', chats.getChats())
+    windows.main.send('update-chats', chats.getAll())
   })
 
   // When a message is sent by the user
@@ -159,7 +159,7 @@ app.on('activate', windows.main.activate)
       // TODO: Copy media to media dir
       chats.addMessage(receiverId, { ...message })
       // Optimistically update UI
-      windows.main.send('update-chats', chats.getChats())
+      windows.main.send('update-chats', chats.getAll())
 
       if (
         contentType === CONTENT_TYPES.IMAGE ||
@@ -207,12 +207,7 @@ app.on('activate', windows.main.activate)
     // Delete chat and keys
     await Promise.all([chats.delete(chatId), crypto.deleteKey(chatId)])
     // Update UI
-    windows.main.send(
-      'update-chats',
-      chats.getChats(),
-      chats.getLatestId(),
-      true
-    )
+    windows.main.send('update-chats', chats.getAll(), chats.getLatestId(), true)
   })
   // When user wants to copy a chat PGP key
   ipcMain.on('copy-pgp', async (event, chatId) =>
@@ -248,14 +243,19 @@ app.on('activate', windows.main.activate)
   }
 
   userId = crypto.getId()
-  // TODO: remove this
+  // TODO: remove this (debug)
   console.log('--> ' + userId)
   windows.main.send('log', userId)
 
   // Get last active chat
   const lastActiveChat = state.get('lastActiveChat', chats.getLatestId())
   // Populate UI with chats
-  windows.main.send('update-chats', chats.getChats(), lastActiveChat)
+  windows.main.send('update-chats', chats.getAll(), lastActiveChat)
+
+  // TODO: remove this (debug)
+  ipcMain.on('get-chats', async event =>
+    windows.main.send('update-chats', chats.getAll(), lastActiveChat)
+  )
 
   try {
     // Authenticate with and connect to the signal server
@@ -274,7 +274,7 @@ app.on('activate', windows.main.activate)
   }
 
   // Establish connections with chat peers
-  Object.values(chats.getChats())
+  Object.values(chats.getAll())
     .filter(chat => !peers.has(chat.id)) // Ignore already connecting to
     .forEach(chat => peers.connect(chat.id))
 })()

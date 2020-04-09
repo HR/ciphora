@@ -6,7 +6,7 @@ export default function CreatePGPModal (props) {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [passphrase, setPassphrase] = useState('')
-  const [algo, setAlgo] = useState('')
+  const [algo, setAlgo] = useState(PGP_KEY_ALGOS[0])
 
   const gotGeneratedKey = !!props.message && !!props.message.longText
 
@@ -48,9 +48,6 @@ export default function CreatePGPModal (props) {
       ></input>
       <br />
       <select value={algo} onChange={event => setAlgo(event.target.value)}>
-        <option value='' disabled='disabled' selected='selected'>
-          Select your key algorithm
-        </option>
         {PGP_KEY_ALGOS.map(algo => (
           <option key={algo} value={algo}>
             {algo.toUpperCase()}
