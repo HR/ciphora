@@ -69,7 +69,6 @@ export default class App extends React.Component {
     this.createComposeChat = this.createComposeChat.bind(this)
     this.deleteComposeChat = this.deleteComposeChat.bind(this)
     this.sendFileHandler = this.sendFileHandler.bind(this)
-    this.openFileHandler = this.openFileHandler.bind(this)
 
     // Add event listeners
     ipcRenderer.on('log', (event, data) => console.log(data))
@@ -279,11 +278,6 @@ export default class App extends React.Component {
     )
   }
 
-  openFileHandler (filePath) {
-    // Open file
-    shell.openItem(filePath)
-  }
-
   render () {
     const activeChat =
       this.state.activeChatId && this.state.chats[this.state.activeChatId]
@@ -332,7 +326,8 @@ export default class App extends React.Component {
               onComposeMessage={this.composeMessage}
               onSendFileClick={this.sendFileHandler}
               onInfoClick={() => this.openModal('chatInfo')}
-              onFileClick={this.openFileHandler}
+              onFileClick={filePath => shell.openItem(filePath)}
+              onLinkClick={url => shell.openExternal(url)}
             />
           }
         />

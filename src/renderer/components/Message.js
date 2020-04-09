@@ -10,11 +10,27 @@ const timeFormat = {
   sameElse: 'dddd, D MMMM, YYYY HH:mm'
 }
 
+const LINK_REGEX = /^https?:/i
+const SPACES_REGEX = /\s+/
+
 export default function Message (props) {
   let contentRender = null
   const { message, isMine, startsSequence, endsSequence, showTimestamp } = props
   const { timestamp, contentType, content } = message
   const friendlyTimestamp = moment(timestamp).calendar(null, timeFormat)
+
+  function parseText (text) {
+    // Parse links
+    return text.split(SPACES_REGEX).map((part, index) =>
+      LINK_REGEX.test(part) ? (
+        <a href='#' key={index} onClick={() => props.onLinkClick(part)}>
+          {part}
+        </a>
+      ) : (
+        ` ${part} `
+      )
+    )
+  }
 
   switch (contentType) {
     case CONTENT_TYPES.IMAGE:
@@ -49,7 +65,7 @@ export default function Message (props) {
       // Render as text
       contentRender = (
         <div className='bubble' title={friendlyTimestamp}>
-          {content}
+          {parseText(content)}
         </div>
       )
   }

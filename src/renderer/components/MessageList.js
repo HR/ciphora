@@ -82,6 +82,7 @@ export default function MessageList (props) {
           message={current}
           onLoad={scrollToBottom}
           onFileClick={props.onFileClick}
+          onLinkClick={props.onLinkClick}
         />
       )
     }
