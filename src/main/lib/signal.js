@@ -44,13 +44,6 @@ module.exports = class Signal extends EventEmitter {
     })
   }
 
-  // Emits a received signal event
-  _emit (msg) {
-    const { event, data } = JSON.parse(msg)
-    console.log(`Signal event: ${event}`)
-    this.emit(event, data)
-  }
-
   // Sends signal to a peer (via server)
   send (type, extras = {}, cb) {
     const msg = JSON.stringify({ type, senderId: this._id, ...extras })
@@ -58,5 +51,12 @@ module.exports = class Signal extends EventEmitter {
       return new Promise((resolve, reject) => this._ws.send(msg, null, resolve))
     }
     this._ws.send(msg, null, cb)
+  }
+
+  // Emits a received signal event
+  _emit (msg) {
+    const { event, data } = JSON.parse(msg)
+    console.log(`Signal event: ${event}`)
+    this.emit(event, data)
   }
 }

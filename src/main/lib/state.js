@@ -7,7 +7,7 @@
 const STATE_DB_KEY = 'state'
 
 module.exports = class State {
-  constructor(store) {
+  constructor (store) {
     // Ensure singleton
     if (!!State.instance) {
       return State.instance
@@ -16,18 +16,11 @@ module.exports = class State {
     this._store = store
     this._state = {}
 
-    // Bindings
     State.instance = this
   }
 
-  // Saves state to the store
-  async _saveState() {
-    await this._store.put(STATE_DB_KEY, this._state)
-    console.log('Saved state')
-  }
-
   // Loads all saved state from the store
-  async init() {
+  async init () {
     try {
       this._state = await this._store.get(STATE_DB_KEY)
       console.log('Loaded state')
@@ -41,18 +34,24 @@ module.exports = class State {
   }
 
   // Gets the state
-  getState() {
+  getState () {
     return this._state
   }
 
   // Sets a state value
-  set(key, value) {
+  set (key, value) {
     this._state[key] = value
     this._saveState()
   }
 
   // Gets a state value, otherwise returns default
-  get(key, def = false) {
+  get (key, def = false) {
     return this._state.hasOwnProperty(key) ? this._state[key] : def
+  }
+
+  // Saves state to the store
+  async _saveState () {
+    await this._store.put(STATE_DB_KEY, this._state)
+    console.log('Saved state')
   }
 }

@@ -1,7 +1,7 @@
 'use strict'
 /**
  * Peers class
- * Initiates and manages peer connections
+ * Manages peer connections and communication
  */
 
 const stream = require('stream'),
@@ -47,7 +47,12 @@ module.exports = class Peers extends EventEmitter {
     this._onSignalReceiverOffline = this._onSignalReceiverOffline.bind(this)
 
     // Add queue event listeners
-    this._sendingQueue.on('error', (id, error) => console.error(id, error))
+    this._sendingQueue.on('error', (...args) =>
+      this.emit('send-error', ...args)
+    )
+    this._receivingQueue.on('error', (...args) =>
+      this.emit('receive-error', ...args)
+    )
 
     // Add signal event listeners
     this._signal.on('signal-request', this._onSignalRequest)
@@ -56,6 +61,34 @@ module.exports = class Peers extends EventEmitter {
     this._signal.on('unknown-receiver', this._onSignalReceiverOffline)
 
     Peers.instance = this
+  }
+
+  // Connects to given peer
+  connect (receiverId) {
+    // Start connection
+    const signalRequest = (this._requests[receiverId] = {
+      receiverId,
+      timestamp: new Date().toISOString()
+    })
+    // Send a signal request to peer
+    this._signal.send('signal-request', signalRequest)
+    console.log('Signal request sent')
+  }
+
+  // Checks if given peer has been added
+  has (id) {
+    return this._peers.hasOwnProperty(id)
+  }
+
+  // Checks if given peer is connected
+  isConnected (id) {
+    return this._peers[id] && this._peers[id].connected
+  }
+
+  // Sends a chat message to given peer
+  sendMessage (id, ...args) {
+    // Queue to send
+    this._sendingQueue.add(() => this._send('message', ...args), id)
   }
 
   // Handles signal requests
@@ -124,6 +157,16 @@ module.exports = class Peers extends EventEmitter {
     }
   }
 
+  // Adds sender to initiate a connection with receiving peer
+  _addSender (...args) {
+    this._addPeer(true, ...args)
+  }
+
+  // Adds a receiver to Initiate a connection with sending peer
+  _addReceiver (...args) {
+    this._addPeer(false, ...args)
+  }
+
   // Initiates a connection with the given peer and sets up communication
   _addPeer (initiator, userId) {
     const peer = (this._peers[userId] = new Peer({
@@ -132,7 +175,7 @@ module.exports = class Peers extends EventEmitter {
       reconnectTimer: 1000
     }))
     const type = initiator ? 'Sender' : 'Receiver'
-    peer.isConnected = false
+    peer.connected = false
 
     peer.on('signal', data => {
       // Trickle signal data to the peer
@@ -144,7 +187,7 @@ module.exports = class Peers extends EventEmitter {
     })
 
     peer.on('connect', async () => {
-      peer.isConnected = true
+      peer.connected = true
       // Initialises a chat session
       const keyMessage = await this._crypto.initSession(userId)
       // Send the master secret public key with signature to the user
@@ -154,19 +197,21 @@ module.exports = class Peers extends EventEmitter {
     })
 
     peer.on('close', () => {
-      peer.isConnected = false
+      peer.connected = false
       this.emit('disconnect', userId)
     })
 
     peer.on('error', err => this.emit('error', userId, err))
 
     peer.on('data', data =>
+      // Queue to receive
       this._receivingQueue.add(() =>
         this._onMessage(userId, data.toString('utf8'))
       )
     )
 
     peer.on('datachannel', (datachannel, id) =>
+      // Queue to receive
       this._receivingQueue.add(() =>
         this._onDataChannel(userId, datachannel, id)
       )
@@ -176,32 +221,26 @@ module.exports = class Peers extends EventEmitter {
   // Handles new messages
   async _onMessage (userId, data) {
     // Try to deserialize message
-    try {
-      console.log('*******> Got message', data)
-      const { type, ...message } = JSON.parse(data)
-      console.log(`Got ${type}:`, message)
-      if (type === 'key') {
-        // When a new session key is received from a user
-        console.log('*******> Got key')
-        this._crypto.startSession(userId, message)
-        return
-      }
+    console.log('------> Got new message', data)
+    const { type, ...message } = JSON.parse(data)
 
-      if (message.contentType === CONTENT_TYPES.TEXT) {
-        console.log('*******> Got Text')
-        const { decryptedMessage } = await this._crypto.decrypt(userId, message)
-        this.emit(type, userId, decryptedMessage)
-        return
-      }
-    } catch (e) {
-      console.error(e, '-> err')
-      // this.emit('error', e)
+    if (type === 'key') {
+      // Start a new crypto session with received key
+      this._crypto.startSession(userId, message)
+      return
+    }
+
+    if (message.contentType === CONTENT_TYPES.TEXT) {
+      // Decrypt received text message
+      const { decryptedMessage } = await this._crypto.decrypt(userId, message)
+      this.emit(type, userId, decryptedMessage)
+      return
     }
   }
 
   // Handles new data channels (file streams)
   async _onDataChannel (userId, receivingStream, id) {
-    console.log('>> Received new stream', id)
+    console.log('------> Got new datachannel', id)
     const { type, ...message } = JSON.parse(id)
     let { decryptedMessage, contentDecipher } = await this._crypto.decrypt(
       userId,
@@ -220,40 +259,9 @@ module.exports = class Peers extends EventEmitter {
     this.emit(type, userId, decryptedMessage)
   }
 
-  // Adds sender to initiate a connection with receiving peer
-  _addSender (...args) {
-    this._addPeer(true, ...args)
-  }
-
-  // Adds a receiver to Initiate a connection with sending peer
-  _addReceiver (...args) {
-    this._addPeer(false, ...args)
-  }
-
-  // Connects to given peer
-  connect (receiverId) {
-    // Start connection
-    const signalRequest = (this._requests[receiverId] = {
-      receiverId,
-      timestamp: new Date().toISOString()
-    })
-    // Send a signal request to peer
-    this._signal.send('signal-request', signalRequest)
-    console.log('Signal request sent')
-  }
-
-  // Checks if given peer has been added
-  has (id) {
-    return this._peers.hasOwnProperty(id)
-  }
-
-  // Checks if given peer is connected
-  isConnected (id) {
-    return this._peers[id] && this._peers[id].isConnected
-  }
-
   // Sends a message to given peer
   async _send (type, receiverId, message, encrypt, contentPath) {
+    // TODO: Queue message if not connected / no session for later
     if (!this.isConnected(receiverId)) return false
 
     const peer = this._peers[receiverId]
@@ -268,31 +276,28 @@ module.exports = class Peers extends EventEmitter {
       message = encryptedMessage
     }
 
-    // Serialize
     const serializedMessage = JSON.stringify({
       type,
       ...message
     })
 
+    // Simply send message if no file to stream
     if (!contentPath) {
       peer.write(serializedMessage)
       console.log(type, 'sent', message)
       return
     }
 
-    console.log('Streaming message', message, contentPath)
+    // Stream file
+    console.log('Streaming', message, contentPath)
     const contentReadStream = fs.createReadStream(contentPath)
     const sendingStream = peer.createDataChannel(serializedMessage)
     await pipeline(
       contentReadStream,
       contentCipher,
+      // Throttle stream (backpressure)
       brake(MESSAGE_CHUNK_SIZE, { period: MESSAGE_STREAM_RATE }),
       sendingStream
     )
-  }
-
-  // Sends a chat message to given peer
-  async sendMessage (id, ...args) {
-    this._sendingQueue.add(() => this._send('message', ...args), id)
   }
 }

@@ -12,19 +12,11 @@ module.exports = class Chats {
     if (!!Chats.instance) {
       return Chats.instance
     }
-    Chats.instance = this
 
     this._store = store
     this._chats = {}
 
-    // Bindings
-    return this
-  }
-
-  // Saves chats to the store
-  async _saveChats () {
-    await this._store.put(CHATS_DB_KEY, this._chats)
-    console.log('Saved chats')
+    Chats.instance = this
   }
 
   // Loads all saved chats from the store
@@ -104,5 +96,11 @@ module.exports = class Chats {
   // Set a chat as offline
   setOffline (id) {
     return (this._chats[id].online = false)
+  }
+
+  // Saves chats to the store
+  async _saveChats () {
+    await this._store.put(CHATS_DB_KEY, this._chats)
+    console.log('Saved chats')
   }
 }

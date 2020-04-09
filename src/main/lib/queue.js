@@ -18,39 +18,6 @@ module.exports = class Queue extends EventEmitter {
     this._idle = true
   }
 
-  // Processes next task in queue
-  async _next () {
-    if (!this._pendingCount) return (this._idle = true) // Finished processing
-    console.log(this._queue, this._processing, this._pendingCount)
-    this._idle = false
-    this._pendingCount--
-    if (this._processing > 0) {
-      const { removeWhenDone } = this._queue[this._processing]
-      if (removeWhenDone) this._remove(this._processing)
-    }
-    // Run task
-    this._queue[++this._processing].run()
-  }
-
-  // When a task fails
-  _error (id, error) {
-    this.emit('error', id, error)
-  }
-
-  // Removes task at given position in queue
-  _remove (index) {
-    console.log('Removed task at index', index)
-    // clearTimeout(this._queue[index].timer)
-    return delete this._queue[index]
-  }
-
-  // Remove task by id
-  remove (id) {
-    const index = this._queue.findIndex(task => task.id === id)
-    if (index < 0) return false
-    return this._remove(index)
-  }
-
   // Adds a task
   // TODO: Add timeout interval for task hangup
   add (fn, id) {
@@ -89,5 +56,38 @@ module.exports = class Queue extends EventEmitter {
       console.log('Idle, start', id)
       this._next()
     }
+  }
+
+  // Remove task by id
+  remove (id) {
+    const index = this._queue.findIndex(task => task.id === id)
+    if (index < 0) return false
+    return this._remove(index)
+  }
+
+  // Processes next task in queue
+  async _next () {
+    if (!this._pendingCount) return (this._idle = true) // Finished processing
+    console.log(this._queue, this._processing, this._pendingCount)
+    this._idle = false
+    this._pendingCount--
+    if (this._processing > 0) {
+      const { removeWhenDone } = this._queue[this._processing]
+      if (removeWhenDone) this._remove(this._processing)
+    }
+    // Run task
+    this._queue[++this._processing].run()
+  }
+
+  // Removes task at given position in queue
+  _remove (index) {
+    console.log('Removed task at index', index)
+    // clearTimeout(this._queue[index].timer)
+    return delete this._queue[index]
+  }
+
+  // When a task fails
+  _error (id, error) {
+    this.emit('error', id, error)
   }
 }

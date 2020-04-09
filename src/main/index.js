@@ -53,23 +53,23 @@ app.on('window-all-closed', () => {
 
 app.on('activate', windows.main.activate)
 ;(async () => {
-  let userId
+  // TODO: Modularise all listeners
+  console.log('\n\n\n**********************************************> New run\n')
+
   await app.whenReady()
   Menu.setApplicationMenu(menu)
 
+  let userId
   const db = await levelup(encode(leveldown(dbPath), { valueEncoding: 'json' }))
-  // TODO: remove this
-  // await db.del('chatKeys')
-  // await db.del('chats')
   const crypto = new Crypto(db)
   const state = new State(db)
   const chats = new Chats(db)
   const signal = new Signal()
   const peers = new Peers(signal, crypto)
 
-  // TODO: Modularise all listeners
-  console.log('\n\n\n**********************************************> New run\n')
-
+  /**
+   * Signal events
+   *****************************/
   // When a new chat request is received from a user
   signal.on('chat-request', async ({ senderPublicKey: publicKeyArmored }) => {
     console.log('Chat request received')
@@ -113,6 +113,9 @@ app.on('activate', windows.main.activate)
     }
   })
 
+  /**
+   * Peers events
+   *****************************/
   // When a new connection with a user is established
   peers.on('connect', async userId => {
     console.log('Connected with', userId)
@@ -140,6 +143,9 @@ app.on('activate', windows.main.activate)
     windows.main.send('update-chats', chats.getAll())
   })
 
+  /**
+   * IPC events
+   *****************************/
   // When a message is sent by the user
   ipcMain.on(
     'send-message',
@@ -171,8 +177,7 @@ app.on('activate', windows.main.activate)
         // Hash content for verification
         message.contentHash = await crypto.hashFile(contentPath)
       }
-      // TODO: Queue message if not connected / no session for later
-      if (!peers.isConnected(receiverId)) return
+
       peers.sendMessage(message.id, receiverId, message, true, contentPath)
     }
   )
@@ -226,6 +231,9 @@ app.on('activate', windows.main.activate)
     crypto.importKey(params)
   )
 
+  /**
+   * Init
+   *****************************/
   // Init PGP keys, state and chats and main window in parallel
   const [keyExists] = await Promise.all([
     crypto.init(),
@@ -243,16 +251,14 @@ app.on('activate', windows.main.activate)
   }
 
   userId = crypto.getId()
-  // TODO: remove this (debug)
-  console.log('--> ' + userId)
-  windows.main.send('log', userId)
-
   // Get last active chat
   const lastActiveChat = state.get('lastActiveChat', chats.getLatestId())
   // Populate UI with chats
   windows.main.send('update-chats', chats.getAll(), lastActiveChat)
 
   // TODO: remove this (debug)
+  console.log('------> CiphoraId', userId)
+  windows.main.send('log', userId)
   ipcMain.on('get-chats', async event =>
     windows.main.send('update-chats', chats.getAll(), lastActiveChat)
   )
