@@ -233,6 +233,8 @@ module.exports = class Peers extends EventEmitter {
     if (message.contentType === CONTENT_TYPES.TEXT) {
       // Decrypt received text message
       const { decryptedMessage } = await this._crypto.decrypt(userId, message)
+      // Ignore if validation failed
+      if (!decryptedMessage) return
       this.emit(type, userId, decryptedMessage)
       return
     }
@@ -247,6 +249,8 @@ module.exports = class Peers extends EventEmitter {
       message,
       true
     )
+    // Ignore if validation failed
+    if (!decryptedMessage) return
     const mediaDir = path.join(MEDIA_DIR, userId, message.contentType)
     // Recursively make media directory
     await mkdir(mediaDir, { recursive: true })

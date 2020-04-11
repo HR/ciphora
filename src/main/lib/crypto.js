@@ -446,8 +446,9 @@ module.exports = class Crypto {
     const { counter } = sendingChain.chain
     // Encrypt message contents
     const messageCipher = crypto.createCipheriv(CIPHER, encryptKey, iv)
-    let content = messageCipher.update(message.content, 'utf8', 'hex')
-    content += messageCipher.final('hex')
+    const content =
+      messageCipher.update(message.content, 'utf8', 'hex') +
+      messageCipher.final('hex')
 
     // Construct full message
     let encryptedMessage = {
@@ -501,8 +502,9 @@ module.exports = class Crypto {
     )
     // Decrypt the message contents
     const messageDecipher = crypto.createDecipheriv(CIPHER, decryptKey, iv)
-    let content = messageDecipher.update(message.content, 'hex', 'utf8')
-    content += messageDecipher.final('utf8')
+    const content =
+      messageDecipher.update(message.content, 'hex', 'utf8') +
+      messageDecipher.final('utf8')
     console.log('--> Decrypted content', content)
 
     const decryptedMessage = { ...message, content }
