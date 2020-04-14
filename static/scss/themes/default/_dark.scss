@@ -1,12 +1,16 @@
 $darkTheme: (
   primaryColor: #0061E6,
   backgroundColor: #000,
-  overlayBackgroundColor: rgba(0, 0, 0, 0.8),
-  secondaryBackgroundColor: #111,
+  overlayBackgroundColor: rgba(0, 0, 0, 0.5),
+  secondaryBackgroundColor: #333,
 
   primaryForegroundColor: #fff,
-  secondaryForegroundColor: #666,
+  primaryColorForegroundColor: #fff,
+  secondaryForegroundColor: #aaa,
   mutedForegroundColor: #252525,
+
+  highlightBorderColor: #333,
+  modalShadowColor: rgba(255, 255, 255, 0.1),
   
   buttonBackgroundColor: #0061E6,
   buttonForegroundColor: #fff,

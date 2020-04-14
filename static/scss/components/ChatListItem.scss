@@ -5,6 +5,8 @@
     display: flex;
     align-items: center;
     padding: 10px;
+    border-bottom: 1px solid themed('highlightBorderColor');
+    transition: background 0.2s;
   }
 
   .chat-list-item:hover,
@@ -65,6 +67,7 @@
     line-height: 50px;
     text-align: center;
     background: lighten(themed('secondaryBackgroundColor'), 20%);
+    border: 1px solid themed('highlightBorderColor');
     font-weight: bold;
     position: relative;
   }

@@ -5,7 +5,7 @@
     padding: 6px 15px;
     display: flex;
     align-items: center;
-    border-top: 1px solid themed('secondaryBackgroundColor');
+    border-top: 1px solid themed('highlightBorderColor');
     position: sticky;
     bottom: 0px;
     background-color: themed('overlayBackgroundColor');
@@ -21,7 +21,7 @@
   }
 
   .compose-input::placeholder {
-    opacity: 0.3;
+    opacity: 0.8;
   }
 
   .compose .toolbar-button {

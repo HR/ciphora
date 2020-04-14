@@ -25,13 +25,13 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    border: 1px solid themed('secondaryBackgroundColor');
+    border: 1px solid themed('highlightBorderColor');
     border-radius: 6px;
     background: themed('backgroundColor');
     width: 550px;
     min-height: 350px;
     display: none;
-    box-shadow: 0 0 60px 10px rgba(0, 0, 0, 0.9);
+    box-shadow: 0 0 60px 5px themed('modalShadowColor');
     text-align: center;
     padding: 1rem;
   }

@@ -5,7 +5,7 @@
     display: grid;
     width: 100%;
     height: 100vh;
-    background: themed('secondaryBackgroundColor');
+    background: themed('highlightBorderColor');
     grid-template-columns: 270px auto;
     grid-template-rows: 60px auto 60px;
     grid-column-gap: 1px;

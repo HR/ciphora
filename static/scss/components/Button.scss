@@ -9,12 +9,12 @@
     margin: 0;
     text-decoration: none;
     background: themed('primaryColor');
-    color: themed('primaryForegroundColor');
+    color: themed('buttonForegroundColor');
     font-size: 1rem;
     font-weight: bold;
     cursor: pointer;
     text-align: center;
-    transition: background 250ms ease-in-out,
+    transition: filter 250ms ease-in-out,
       transform 150ms ease;
     -webkit-appearance: none;
   }
