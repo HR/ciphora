@@ -3,6 +3,7 @@
 @include themify() {
   .modal-cover {
     position: fixed;
+    display: block;
     top: 0;
     bottom: 0;
     left: 0;
@@ -11,33 +12,56 @@
     width: 100%;
     height: 100%;
     z-index: 50;
-    display: none;
+    visibility: collapse;
+    transition: visibility 0.3s, opacity 0.3s;
   }
 
-  .modal-cover.modal-cover-active {
-    display: block;
+  .modal:not(.modal-active) .modal-cover {
+    opacity: 0;
+  }
+
+  .modal-active .modal-cover {
     z-index: 1024;
+    visibility: visible;
   }
 
-  .modal-container {
+  .modal-outer-container {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
     z-index: 1050;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    visibility: collapse;
+    transition: visibility 0.3s;
+  }
+
+  .modal-active .modal-outer-container {
+    visibility: visible;
+  }
+
+  .modal-inner-container {
+    position: relative;
     border: 1px solid themed('highlightBorderColor');
     border-radius: 6px;
     background: themed('backgroundColor');
     width: 550px;
     min-height: 350px;
-    display: none;
     box-shadow: 0 0 60px 5px themed('modalShadowColor');
     text-align: center;
     padding: 1rem;
+    transition: opacity 0.3s, transform 0.3s;
   }
 
-  .modal-container.modal-container-active {
-    display: block;
+  .modal:not(.modal-active) .modal-inner-container {
+    transform: translateY(50%);
+    opacity: 0;
   }
 
   .modal-header h1 {
@@ -78,7 +102,7 @@
     background: themed('backgroundColor');
   }
 
-  .modal-container .cancel {
+  .modal-inner-container .cancel {
     position: absolute;
     right: 20px;
     top: 5px;
@@ -109,13 +133,13 @@
     resize: none;
   }
 
-  .modal-container .error-message {
+  .modal-inner-container .error-message {
     color: themed('dangerForegroundColor');
     margin: 0;
     margin-bottom: 10px;
   }
 
-  .modal-container .message {
+  .modal-inner-container .message {
     color: themed('primaryColor');
     margin: 0;
     margin-bottom: 10px;
