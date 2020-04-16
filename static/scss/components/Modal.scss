@@ -55,13 +55,17 @@
     min-height: 350px;
     box-shadow: 0 0 60px 5px themed('modalShadowColor');
     text-align: center;
-    padding: 1rem;
     transition: opacity 0.3s, transform 0.3s;
   }
 
   .modal:not(.modal-active) .modal-inner-container {
     transform: translateY(50%);
     opacity: 0;
+  }
+
+  .modal-header {
+    padding: 0.5rem 1rem 0;
+    border-bottom: 1px solid themed('highlightBorderColor');
   }
 
   .modal-header h1 {
@@ -80,7 +84,8 @@
   }
 
   .modal-body {
-    margin-top: 34px;
+    padding: 2rem 1rem;
+    text-align: left;
   }
 
   .modal-body hr.divider {
@@ -143,5 +148,10 @@
     color: themed('primaryColor');
     margin: 0;
     margin-bottom: 10px;
+  }
+
+  .modal-action {
+    border-top: 1px solid themed('highlightBorderColor');
+    padding: 1rem;
   }
 }

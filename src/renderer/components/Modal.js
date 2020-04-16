@@ -2,8 +2,8 @@ import React from 'react'
 
 export default function Modal (props) {
   const modalClass = props.open
-    ? 'modal modal-active'
-    : 'modal'
+    ? 'modal modal-active ' + (props.className || '')
+    : 'modal ' + (props.className || '')
   return (
     <div className={modalClass}>
       <div className="modal-outer-container">

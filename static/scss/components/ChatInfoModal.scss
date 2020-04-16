@@ -1,0 +1,39 @@
+@import '../themes';
+
+@include themify() {
+  .chat-info-modal{
+    .userid-area {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      background-color: themed('secondaryBackgroundColor');
+      margin: 1rem 0;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+
+      span {
+        flex-shrink: 0;
+      }
+
+      .userid-input {
+        flex-grow: 1;
+        margin: 0 0.5rem;
+        border: none;
+        font-size: 14px;
+        background: none;
+      }
+    }
+    
+    .copy-buttons {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      column-gap: 0.5rem;
+      row-gap: 0.5rem;
+
+      button {
+        flex-grow: 1;
+      }
+    }
+  }
+}

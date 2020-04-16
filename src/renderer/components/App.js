@@ -65,6 +65,7 @@ export default class App extends React.Component {
     this.composeMessage = this.composeMessage.bind(this)
     this.updateChats = this.updateChats.bind(this)
     this.showModalError = this.showModalError.bind(this)
+    this.copyUserIdHandler = this.copyUserIdHandler.bind(this)
     this.copyPGPHandler = this.copyPGPHandler.bind(this)
     this.createComposeChat = this.createComposeChat.bind(this)
     this.deleteComposeChat = this.deleteComposeChat.bind(this)
@@ -220,6 +221,12 @@ export default class App extends React.Component {
     ipcRenderer.send('delete-chat', id)
   }
 
+  // Handles copy User ID to clipboard request
+  copyUserIdHandler () {
+    this.closeModal()
+    ipcRenderer.send('copy-user-id', this.state.activeChatId.toUpperCase())
+  }
+
   // Handles copy PGP key to clipboard request
   copyPGPHandler () {
     this.closeModal()
@@ -305,6 +312,7 @@ export default class App extends React.Component {
           open={this.state.chatInfo}
           chat={activeChat}
           onClose={this.closeModal}
+          onCopyUserIdClick={this.copyUserIdHandler}
           onCopyPGPClick={this.copyPGPHandler}
           onDeleteClick={this.deleteChatHandler}
         />

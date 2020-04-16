@@ -214,6 +214,10 @@ app.on('activate', windows.main.activate)
     // Update UI
     windows.main.send('update-chats', chats.getAll(), chats.getLatestId(), true)
   })
+  // When user wants to copy a user ID
+  ipcMain.on('copy-user-id', async (event, userId) =>
+    clipboard.writeText(userId)
+  )
   // When user wants to copy a chat PGP key
   ipcMain.on('copy-pgp', async (event, chatId) =>
     clipboard.writeText(crypto.getChatPublicKey(chatId))
