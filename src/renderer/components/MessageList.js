@@ -119,7 +119,7 @@ export default function MessageList (props) {
               autoFocus
               type='text'
               className='compose-input'
-              placeholder={'Enter their CiphoraId or paste their PGP Key'}
+              placeholder={'Enter a User ID or PGP Key'}
               value={id}
               onChange={event => setId(event.target.value)}
               onKeyDown={onEnterPress(() => props.onComposeChat(id))}
