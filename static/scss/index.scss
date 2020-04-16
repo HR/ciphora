@@ -9,7 +9,7 @@
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
-  background: themed('backgroundColor');
+  background: themed('windowBackgroundColor');
 
   .danger {
     background: themed('dangerBackgroundColor') !important;

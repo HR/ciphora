@@ -21,6 +21,7 @@ async function init () {
     minWidth: 700,
     minHeight: 400,
     transparent: true,
+    backgroundColor: '#00FFFFFF',
     frame: false,
     titleBarStyle: 'hiddenInset',
     webPreferences: {
