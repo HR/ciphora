@@ -4,16 +4,15 @@
   .toolbar-button {
     color: themed('primaryColor');
     font-size: 28px;
-    transition: all 0.1s;
+    transition: filter 250ms ease-in-out;
   }
 
   .toolbar-button:hover {
     cursor: pointer;
-    filter: brightness(85%);
+    filter: brightness(80%);
   }
 
   .toolbar-button:active {
-    color: themed('primaryColor');
-    opacity: 0.25;
+    filter: brightness(60%);
   }
 }
