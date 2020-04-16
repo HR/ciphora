@@ -14,19 +14,18 @@
     font-weight: bold;
     cursor: pointer;
     text-align: center;
-    transition: filter 250ms ease-in-out,
-      transform 150ms ease;
+    transition: filter 250ms ease-in-out;
     -webkit-appearance: none;
   }
 
   button:hover,
   button:focus {
-    filter: brightness(85%);
+    filter: brightness(80%);
     cursor: pointer;
   }
 
   button:active {
-    transform: scale(0.99);
+    filter: brightness(60%);
   }
 
   button:disabled {
