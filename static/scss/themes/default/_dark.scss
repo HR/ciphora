@@ -1,19 +1,22 @@
 $darkTheme: (
   primaryColor: #0061E6,
   
-  windowBackgroundColor: rgba(0, 0, 0, 0.9),
-  backgroundColor: #000,
-  overlayBackgroundColor: rgba(0, 0, 0, 0.5),
-  secondaryBackgroundColor: #333,
+  windowBackgroundColor: #555d,
+  backgroundColor: #222e,
+  sidebarBackgroundColor: #5550,
+  overlayBackgroundColor: #5556,
 
-  primaryForegroundColor: #fff,
+  primaryForegroundColor: #fffc,
   primaryColorForegroundColor: #fff,
   secondaryForegroundColor: #aaa,
   mutedForegroundColor: #252525,
 
   highlightBorderColor: #333,
-  modalShadowColor: rgba(255, 255, 255, 0.1),
+
+  modalOverlayColor: #1119,
+  modalShadowColor: #0008,
   
+  toolbarButtonColor: #fff,
   buttonBackgroundColor: #0061E6,
   buttonForegroundColor: #fff,
 

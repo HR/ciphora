@@ -7,7 +7,7 @@
       flex-direction: row;
       justify-content: center;
       align-items: center;
-      background-color: themed('secondaryBackgroundColor');
+      background-color: themed('backgroundColor');
       margin: 1rem 0;
       padding: 0.5rem 1rem;
       border-radius: 4px;
@@ -25,15 +25,9 @@
       }
     }
     
-    .copy-buttons {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      column-gap: 0.5rem;
-      row-gap: 0.5rem;
-
-      button {
-        flex-grow: 1;
-      }
+    .modal-action button {
+      width: 100%;
+      margin: 0.5rem 0;
     }
   }
 }

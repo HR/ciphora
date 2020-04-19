@@ -20,14 +20,12 @@ export default function ChatInfoModal (props) {
             <span>User ID:</span>
             <input className='userid-input' type='text' readOnly value={chat.id.toUpperCase()} />
           </div>
-          <div className='copy-buttons'>
-            <button onClick={props.onCopyUserIdClick}>Copy User ID</button>
-            <button onClick={props.onCopyPGPClick}>Copy PGP Key</button>
-          </div>
         </React.Fragment>
       }
       action={
         <React.Fragment>
+          <button onClick={props.onCopyUserIdClick}>Copy User ID</button>
+          <button onClick={props.onCopyPGPClick}>Copy PGP Key</button>
           <button className='danger' onClick={props.onDeleteClick}>
             Delete Chat
           </button>

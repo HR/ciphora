@@ -1,19 +1,22 @@
 $lightTheme: (
   primaryColor: #0084ff,
   
-  windowBackgroundColor: rgba(255, 255, 255, 0.9),
-  backgroundColor: #fff,
-  overlayBackgroundColor: rgba(255, 255, 255, 0.6),
-  secondaryBackgroundColor: #ddd,
+  windowBackgroundColor: #fffe,
+  backgroundColor: #eeee,
+  sidebarBackgroundColor: #fff0,
+  overlayBackgroundColor: #ffff,
 
   primaryForegroundColor: #000000,
   primaryColorForegroundColor: #fff,
   secondaryForegroundColor: #555,
   mutedForegroundColor: #a5a5a5,
 
-  highlightBorderColor: #ddd,
-  modalShadowColor: rgba(0, 0, 0, 0.2),
+  highlightBorderColor: #eee,
+
+  modalOverlayColor: #1119,
+  modalShadowColor: #0003,
   
+  toolbarButtonColor: #0084ff,
   buttonBackgroundColor: #0084ff,
   buttonForegroundColor: #fff,
 

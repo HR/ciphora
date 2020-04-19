@@ -2,7 +2,7 @@
 
 @include themify() {
   .toolbar-button {
-    color: themed('primaryColor');
+    color: themed('toolbarButtonColor');
     font-size: 28px;
     transition: filter 250ms ease-in-out;
   }

@@ -11,7 +11,7 @@
 
   .chat-list-item:hover,
   .chat-list-item-active {
-    background: themed('secondaryBackgroundColor');
+    background: themed('backgroundColor');
     cursor: pointer;
   }
 
@@ -66,7 +66,7 @@
     font-size: 1rem;
     line-height: 50px;
     text-align: center;
-    background: lighten(themed('secondaryBackgroundColor'), 20%);
+    background: lighten(themed('backgroundColor'), 20%);
     border: 1px solid themed('highlightBorderColor');
     font-weight: bold;
     position: relative;

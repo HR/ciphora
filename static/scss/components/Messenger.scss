@@ -8,8 +8,8 @@
     background: transparent;
     grid-template-columns: 270px auto;
     grid-template-rows: 60px auto 60px;
-    grid-column-gap: 1px;
-    grid-row-gap: 1px;
+    grid-column-gap: 0;
+    grid-row-gap: 0;
   }
 
   .container {
@@ -28,17 +28,17 @@
   .sidebar {
     grid-row-start: 1;
     grid-row-end: span 3;
-    border-right: 1px solid themed('highlightBorderColor');
+    background: themed('sidebarBackgroundColor');
   }
 
   .content {
-    background: transparentize($color: themed('backgroundColor'), $amount: 0.6);
+    background: themed('backgroundColor');
     grid-row-start: 1;
     grid-row-end: span 3;
   }
 
   .footer {
     grid-column-start: 2;
-    background: themed('backgroundColor');
+    background-color: themed('backgroundColor');
   }
 }

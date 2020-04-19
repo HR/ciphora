@@ -48,7 +48,7 @@
 
   .message .bubble-container .bubble {
     margin: 1px 0px;
-    background: themed('secondaryBackgroundColor');
+    background: themed('backgroundColor');
     padding: 10px 15px;
     border-radius: 20px;
     max-width: 75%;
@@ -60,7 +60,7 @@
 
   .message .bubble-container .bubble.file {
     background: none !important;
-    border: 2px solid themed('secondaryBackgroundColor');
+    border: 2px solid themed('backgroundColor');
     padding: 20px;
     text-align: center;
     width: 130px;
