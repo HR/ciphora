@@ -12,6 +12,7 @@
     margin-bottom: 15px;
     width: 300px;
     background: themed('backgroundColor');
+    backdrop-filter: blur(20px);
     text-align: left;
     font-size: 14px;
     overflow: hidden;
