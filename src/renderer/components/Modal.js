@@ -1,11 +1,13 @@
 import React from 'react'
+import { classList } from '../lib/util'
 
 export default function Modal (props) {
-  const modalClass = props.open
-    ? 'modal modal-active ' + (props.className || '')
-    : 'modal ' + (props.className || '')
   return (
-    <div className={modalClass}>
+    <div className={classList({
+      'modal': true,
+      'modal-active': props.open,
+      [props.className]: props.className,
+    })}>
       <div
         className="modal-cover"
         onClick={props.onClose ? props.onClose : undefined}

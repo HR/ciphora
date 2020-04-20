@@ -2,7 +2,6 @@ import React from 'react'
 import Messenger from './Messenger'
 import ChatList from './ChatList'
 import MessageList from './MessageList'
-import ChatInfoModal from './ChatInfoModal'
 import SetupIdentityModal from './SetupIdentityModal'
 import ImportPGPModal from './ImportPGPModal'
 import CreatePGPModal from './CreatePGPModal'
@@ -65,8 +64,6 @@ export default class App extends React.Component {
     this.composeMessage = this.composeMessage.bind(this)
     this.updateChats = this.updateChats.bind(this)
     this.showModalError = this.showModalError.bind(this)
-    this.copyUserIdHandler = this.copyUserIdHandler.bind(this)
-    this.copyPGPHandler = this.copyPGPHandler.bind(this)
     this.createComposeChat = this.createComposeChat.bind(this)
     this.deleteComposeChat = this.deleteComposeChat.bind(this)
     this.sendFileHandler = this.sendFileHandler.bind(this)
@@ -221,18 +218,6 @@ export default class App extends React.Component {
     ipcRenderer.send('delete-chat', id)
   }
 
-  // Handles copy User ID to clipboard request
-  copyUserIdHandler () {
-    this.closeModal()
-    ipcRenderer.send('copy-user-id', this.state.activeChatId.toUpperCase())
-  }
-
-  // Handles copy PGP key to clipboard request
-  copyPGPHandler () {
-    this.closeModal()
-    ipcRenderer.send('copy-pgp', this.state.activeChatId)
-  }
-
   // Activates the selected chat
   activateChat (chatId) {
     // Check if clicked chat already active
@@ -308,14 +293,6 @@ export default class App extends React.Component {
           onDoneClick={this.closeModal}
           message={this.state.modalMessage}
         />
-        <ChatInfoModal
-          open={this.state.chatInfo}
-          chat={activeChat}
-          onClose={this.closeModal}
-          onCopyUserIdClick={this.copyUserIdHandler}
-          onCopyPGPClick={this.copyPGPHandler}
-          onDeleteClick={this.deleteChatHandler}
-        />
         <Messenger
           sidebar={
             <ChatList
@@ -330,12 +307,14 @@ export default class App extends React.Component {
             <MessageList
               composing={this.state.composing}
               onComposeChat={this.composeChatHandler}
+              activeChatPGP={this.state.activeChatId}
               chat={activeChat}
               onComposeMessage={this.composeMessage}
               onSendFileClick={this.sendFileHandler}
               onInfoClick={() => this.openModal('chatInfo')}
               onFileClick={filePath => shell.openItem(filePath)}
               onLinkClick={url => shell.openExternal(url)}
+              onDeleteChat={this.deleteChatHandler}
             />
           }
         />
