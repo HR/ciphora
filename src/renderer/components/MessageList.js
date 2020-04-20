@@ -115,18 +115,20 @@ export default function MessageList (props) {
         leftItems={
           <div className='compose-chat'>
             <span>To: </span>
-            <input
-              autoFocus
-              type='text'
-              className='compose-input'
-              placeholder={'Enter a User ID or PGP Key'}
-              value={id}
-              onChange={event => setId(event.target.value)}
-              onKeyDown={onEnterPress(() => props.onComposeChat(id))}
-              onPaste={event => {
-                props.onComposeChat(event.clipboardData.getData('text/plain'))
-              }}
-            />
+            <div className='compose-input-area'>
+              <input
+                autoFocus
+                type='text'
+                className='compose-input'
+                placeholder={'Enter a User ID or PGP Key'}
+                value={id}
+                onChange={event => setId(event.target.value)}
+                onKeyDown={onEnterPress(() => props.onComposeChat(id))}
+                onPaste={event => {
+                  props.onComposeChat(event.clipboardData.getData('text/plain'))
+                }}
+              />
+            </div>
           </div>
         }
       />
@@ -136,8 +138,12 @@ export default function MessageList (props) {
   }
 
   // Render UI
+  var messageListClasses = [
+    'message-list',
+    props.composing ? ' composing' : '',
+  ];
   return (
-    <div className='message-list'>
+    <div className={messageListClasses.join(' ')}>
       {toolbar}
 
       <div className='message-list-container'>

@@ -11,7 +11,7 @@
 
   .chat-list-item:hover,
   .chat-list-item-active {
-    background: themed('backgroundColor');
+    background: themed('sidebarSelectedItemBackgroundColor');
     cursor: pointer;
   }
 

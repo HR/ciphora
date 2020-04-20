@@ -26,12 +26,13 @@
   }
 
   .sidebar {
+    background: themed('sidebarBackgroundColor');
     grid-row-start: 1;
     grid-row-end: span 3;
   }
 
   .content {
-    background: themed('backgroundColor');
+    background: themed('contentBackgroundColor');
     grid-row-start: 1;
     grid-row-end: span 3;
   }

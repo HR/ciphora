@@ -20,9 +20,9 @@ async function init () {
     height: MAIN_WIN_HEIGHT,
     minWidth: 700,
     minHeight: 400,
-    backgroundColor: '#00FFFFFF',
+    // backgroundColor: '#00FFFFFF',
     frame: false,
-    vibrancy: 'appearance-based',
+    // vibrancy: 'appearance-based',
     titleBarStyle: 'hiddenInset',
     webPreferences: {
       nodeIntegration: true,

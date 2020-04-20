@@ -4,6 +4,7 @@
   .toolbar {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     font-weight: 500;
     position: sticky;
     top: 0px;
@@ -21,7 +22,7 @@
 
   .left-items,
   .right-items {
-    flex: 1;
+    flex: 0 1;
     padding: 10px;
     display: flex;
   }

@@ -1,10 +1,10 @@
 $darkTheme: (
   primaryColor: #0061E6,
   
-  windowBackgroundColor: #000,
-  contentBackgroundColor: #000,
-  backgroundColor: #303030e0,
-  overlayBackgroundColor: #0006,
+  windowBackgroundColor: transparent,
+  contentBackgroundColor: #222e,
+  backgroundColor: #222e,
+  overlayBackgroundColor: #5556,
 
   primaryForegroundColor: #fffc,
   primaryColorForegroundColor: #fff,
@@ -13,8 +13,8 @@ $darkTheme: (
 
   highlightBorderColor: #333,
 
-  sidebarBackgroundColor: #222,
-  sidebarSelectedItemBackgroundColor: #323232,
+  sidebarBackgroundColor: transparent,
+  sidebarSelectedItemBackgroundColor: #222e,
 
   modalBackgroundColor: #555d,
   modalOverlayColor: #1119,

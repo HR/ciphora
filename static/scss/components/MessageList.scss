@@ -7,8 +7,19 @@
     flex-direction: column;
 
     > .toolbar {
+      background-color: themed('overlayBackgroundColor');
       min-height: 53px;
       -webkit-app-region: drag;
+
+      .toolbar-title {
+        flex: 1;
+      }
+    }
+
+    &.composing {
+      > .toolbar .left-items {
+        flex: 1;
+      }
     }
   }
 
