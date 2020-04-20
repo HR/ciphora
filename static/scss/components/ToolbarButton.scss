@@ -45,10 +45,11 @@
     padding: 0.5rem 1rem;
     white-space: nowrap;
     cursor: pointer;
-    transition: background-color 0.2s, filter 0.2s;
+    transition: background-color 0.2s, filter 0.2s, color 0.2s;
 
     &:hover {
       background-color: themed('primaryColor');
+      color: themed('primaryColorForegroundColor');
     }
 
     &:active {
