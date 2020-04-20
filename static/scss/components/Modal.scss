@@ -88,25 +88,33 @@
   .modal-body {
     margin: 1rem;
     text-align: left;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .modal-body button {
+    flex: 0;
   }
 
   .modal-body hr.divider {
     overflow: visible;
     padding: 0;
-    margin-top: 21px;
+    margin-top: 30px;
     margin-bottom: 4px;
     border: none;
-    border-top: 1px solid themed('backgroundColor');
+    border-top: 1px solid themed('highlightBorderColor');
     width: 200px;
   }
 
   .modal-body hr.divider:after {
     content: "or";
+    border-radius: 100rem;
     display: inline-block;
     position: relative;
-    top: -10px;
-    padding: 0 16px;
-    background: themed('backgroundColor');
+    top: -15px;
+    padding: 5px 10px;
+    background: themed('highlightBorderColor');
   }
 
   .modal-inner-container .cancel {
@@ -120,8 +128,8 @@
   .modal-body textarea,
   .modal-body input,
   .modal-body select {
+    align-self: stretch;
     font-size: 0.9rem;
-    width: 480px;
     background: themed('backgroundColor');
     color: themed('primaryForegroundColor');
     border: none;
@@ -130,8 +138,9 @@
     border-radius: .2em;
   }
 
-  .modal-body select {
-    width: 510px;
+  .modal-body textarea::placeholder,
+  .modal-body input::placeholder {
+    color: themed('primaryForegroundColor');
   }
 
   .modal-body textarea {

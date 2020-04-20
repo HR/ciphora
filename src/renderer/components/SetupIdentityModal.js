@@ -4,6 +4,7 @@ import Modal from './Modal'
 export default function SetupIdentityModal (props) {
   return (
     <Modal
+      className='setup-identity-modal'
       header={
         <React.Fragment>
           <i className='ion-ios-contact' />
