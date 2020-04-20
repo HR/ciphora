@@ -6,6 +6,11 @@ export default function Modal (props) {
     : 'modal ' + (props.className || '')
   return (
     <div className={modalClass}>
+      <div
+        className="modal-cover"
+        onClick={props.onClose ? props.onClose : undefined}
+      ></div>
+      
       <div className="modal-outer-container">
         <div className="modal-inner-container" style={{ ...props.style }}>
           {!!props.onClose && (
@@ -21,11 +26,6 @@ export default function Modal (props) {
           {!!props.action && <div className='modal-action'>{props.action}</div>}
         </div>
       </div>
-
-      <div
-        className="modal-cover"
-        onClick={props.onClose ? props.onClose : undefined}
-      ></div>
     </div>
   )
 }

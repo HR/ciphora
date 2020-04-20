@@ -26,6 +26,7 @@
   }
 
   .modal-outer-container {
+    pointer-events: none;
     position: fixed;
     top: 0;
     bottom: 0;
@@ -47,6 +48,7 @@
   }
 
   .modal-inner-container {
+    pointer-events: all;
     position: relative;
     border-radius: 6px;
     overflow: hidden;
