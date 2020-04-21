@@ -7,7 +7,6 @@ mQENBFwFqjEBCAC9ZM3rjdJHmm+hOkuAQ...............................
 ..........................5C1n16MW5bvac4QSY/jhw08sRjLed3Q===7MVT
 -----END PGP PUBLIC KEY BLOCK-----
 
-
 -----BEGIN PGP PRIVATE KEY BLOCK-----
 
 X4doIG+e00kZncAFqeJcMy3ijjvjKypDGU2j............................
@@ -32,7 +31,7 @@ export default function ImportPGPModal (props) {
             placeholder={pgpExample}
             value={keys}
             onChange={event => setKeys(event.target.value)}
-            rows="6"
+            rows='6'
           ></textarea>
           <input
             type='password'

@@ -19,7 +19,6 @@ const initModalsState = {
   setupIdentity: false,
   importPGP: false,
   createPGP: false,
-  chatInfo: false,
   modalMessage: {
     text: '',
     longText: '',
@@ -307,11 +306,10 @@ export default class App extends React.Component {
             <MessageList
               composing={this.state.composing}
               onComposeChat={this.composeChatHandler}
-              activeChatPGP={this.state.activeChatId}
+              activeChatId={this.state.activeChatId}
               chat={activeChat}
               onComposeMessage={this.composeMessage}
               onSendFileClick={this.sendFileHandler}
-              onInfoClick={() => this.openModal('chatInfo')}
               onFileClick={filePath => shell.openItem(filePath)}
               onLinkClick={url => shell.openExternal(url)}
               onDeleteChat={this.deleteChatHandler}

@@ -2,7 +2,11 @@ import { ipcRenderer } from 'electron'
 import React, { useEffect, useState, useRef } from 'react'
 import Compose from './Compose'
 import Toolbar from './Toolbar'
-import { ToolbarButton, ToolbarDropdownButton, ToolbarDropdownItem } from './ToolbarButtons'
+import {
+  ToolbarButton,
+  ToolbarDropdownButton,
+  ToolbarDropdownItem
+} from './ToolbarButtons'
 import Message from './Message'
 import { CONTENT_TYPES } from '../../consts'
 import moment from 'moment'
@@ -18,7 +22,7 @@ export default function MessageList (props) {
     messagesEndRef.current.scrollIntoView({ block: 'end', behavior: 'smooth' })
   }
 
-  // Scroll to the bottom everytime a new message is sent to show it
+  // Scroll to the bottom everytime a new message is sent/received to show it
   useEffect(scrollToBottom, [props.chat])
 
   // Handles copy User ID to clipboard request
@@ -30,7 +34,7 @@ export default function MessageList (props) {
   // Handles copy PGP key to clipboard request
   function onCopyPGPClick () {
     setInfoDropdownActive(false)
-    ipcRenderer.send('copy-pgp', props.activeChatPGP)
+    ipcRenderer.send('copy-pgp', props.activeChatId)
   }
 
   // Handles copy PGP key to clipboard request
@@ -118,13 +122,17 @@ export default function MessageList (props) {
           <ToolbarDropdownButton
             key='info'
             icon='ion-ios-information-circle-outline'
-            onClick={props.onInfoClick}
             active={infoDropdownActive}
             setActive={setInfoDropdownActive}
           >
             <div className='userid-area'>
               <span>User ID:</span>
-              <input className='userid-input' type='text' readOnly value={props.chat.id.toUpperCase()} />
+              <input
+                className='userid-input'
+                type='text'
+                readOnly
+                value={props.chat.id.toUpperCase()}
+              />
             </div>
             <ToolbarDropdownItem onClick={onCopyUserIdClick}>
               Copy User ID
@@ -174,10 +182,7 @@ export default function MessageList (props) {
   }
 
   // Render UI
-  var messageListClasses = [
-    'message-list',
-    props.composing ? ' composing' : '',
-  ];
+  var messageListClasses = ['message-list', props.composing ? ' composing' : '']
   return (
     <div className={messageListClasses.join(' ')}>
       {toolbar}

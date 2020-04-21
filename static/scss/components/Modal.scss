@@ -1,6 +1,11 @@
 @import '../themes';
 
 @include themify() {
+  $select-arrow: 'data:image/svg+xml,%3Csvg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 512 512" xml:space="preserve"%3E%3Cpath fill="%23' +
+    str-slice(to-string(themed('primaryForegroundColor')), 2, 4) +
+    '" d="M256,294.1L383,167c9.4-9.4,24.6-9.4,33.9,0s9.3,24.6,0,34L273,345c-9.1,9.1-23.7,9.3-33.1,0.7L95,201.1 c-4.7-4.7-7-10.9-7-17c0-6.1,2.3-12.3,7-17c9.4-9.4,24.6-9.4,33.9,0L256,294.1z"/%3E%3C/svg%3E%0A';
+  $modal-margin: 1.4rem;
+
   .modal-cover {
     position: fixed;
     display: block;
@@ -48,7 +53,7 @@
   }
 
   .modal-inner-container {
-    padding: 1rem 0;
+    padding: 0;
     pointer-events: all;
     position: relative;
     border-radius: 8px;
@@ -68,7 +73,7 @@
   }
 
   .modal-header {
-    padding: 0 1rem 1rem;
+    padding: $modal-margin;
     border-bottom: 1px solid themed('highlightBorderColor');
     -webkit-app-region: drag;
   }
@@ -81,7 +86,7 @@
 
   .modal-header p {
     font-size: 1rem;
-    margin-top: 0;
+    margin: 0;
   }
 
   .modal-header i {
@@ -89,7 +94,7 @@
   }
 
   .modal-body {
-    margin: 1rem;
+    margin: $modal-margin;
     text-align: left;
     display: flex;
     flex-direction: column;
@@ -111,7 +116,7 @@
   }
 
   .modal-body hr.divider:after {
-    content: "or";
+    content: 'or';
     border-radius: 100rem;
     display: inline-block;
     position: relative;
@@ -138,7 +143,14 @@
     border: none;
     padding: 15px;
     margin-bottom: 10px;
-    border-radius: .2em;
+    border-radius: 0.2em;
+  }
+
+  .modal-body select {
+    background-image: url($select-arrow);
+    background-repeat: no-repeat, repeat;
+    background-position: right 0.7em top 50%, 0 0;
+    background-size: 1rem auto, 100%;
   }
 
   .modal-body textarea::placeholder,
@@ -154,7 +166,7 @@
   .modal-inner-container .error-message {
     color: themed('dangerColor');
     margin: 0;
-    margin-bottom: 10px;
+    margin-top: $modal-margin * 0.3;
   }
 
   .modal-inner-container .message {
@@ -164,6 +176,6 @@
   }
 
   .modal-action {
-    margin: 1rem;
+    margin: $modal-margin;
   }
 }

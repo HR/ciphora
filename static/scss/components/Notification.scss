@@ -23,16 +23,14 @@
     align-items: center;
     justify-content: space-between;
     justify-items: center;
-    box-shadow: rgba(0, 0, 0, 0.15) 0px 1px 10px 0px,
-      rgba(0, 0, 0, 0.1) 0px 6px 12px 0px,
-      rgba(0, 0, 0, 0.12) 0px 6px 15px -2px;
+    @include shadow;
   }
 
-  .notification>.dismiss:hover {
+  .notification > .dismiss:hover {
     opacity: 0.8;
   }
 
-  .notification>.dismiss {
+  .notification > .dismiss {
     cursor: pointer;
   }
 
