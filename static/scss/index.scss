@@ -12,7 +12,8 @@
   background-color: themed('windowBackgroundColor');
 
   .danger {
-    background: themed('dangerBackgroundColor') !important;
+    background: themed('dangerColor') !important;
+    color: themed('dangerForegroundColor') !important;
   }
 
   code {

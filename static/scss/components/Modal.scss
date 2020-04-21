@@ -48,9 +48,10 @@
   }
 
   .modal-inner-container {
+    padding: 1rem 0;
     pointer-events: all;
     position: relative;
-    border-radius: 6px;
+    border-radius: 8px;
     overflow: hidden;
     background: themed('modalBackgroundColor');
     backdrop-filter: blur(20px);
@@ -67,7 +68,7 @@
   }
 
   .modal-header {
-    padding: 0.5rem 1rem 0;
+    padding: 0 1rem 1rem;
     border-bottom: 1px solid themed('highlightBorderColor');
     -webkit-app-region: drag;
   }
@@ -105,7 +106,7 @@
     margin-top: 30px;
     margin-bottom: 4px;
     border: none;
-    border-top: 1px solid themed('highlightBorderColor');
+    border-top: 1px solid themed('backgroundColor');
     width: 200px;
   }
 
@@ -116,7 +117,7 @@
     position: relative;
     top: -15px;
     padding: 5px 10px;
-    background: themed('highlightBorderColor');
+    background: themed('backgroundColor');
   }
 
   .modal-inner-container .cancel {
@@ -147,12 +148,11 @@
 
   .modal-body textarea {
     font-family: monospace;
-    height: 40vh;
     resize: none;
   }
 
   .modal-inner-container .error-message {
-    color: themed('dangerForegroundColor');
+    color: themed('dangerColor');
     margin: 0;
     margin-bottom: 10px;
   }

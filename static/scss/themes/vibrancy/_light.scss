@@ -3,7 +3,8 @@ $lightTheme: (
   
   windowBackgroundColor: transparent,
   contentBackgroundColor: #fffe,
-  backgroundColor: #fffe,
+  backgroundColor: #fff,
+  transparentBackgroundColor: #fffe,
   overlayBackgroundColor: #eeea,
 
   primaryForegroundColor: #000000,
@@ -24,7 +25,7 @@ $lightTheme: (
   buttonBackgroundColor: #0084ff,
   buttonForegroundColor: #fff,
 
-  dangerBackgroundColor: #dc3545,
-  dangerForegroundColor: #fa3c4c,
+  dangerColor: #dc3545,
+  dangerForegroundColor: #fff,
   onlineColor: #01A452,
 );

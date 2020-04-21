@@ -30,6 +30,7 @@
       backdrop-filter: blur(20px);
       box-shadow: 0 0 60px 5px themed('modalShadowColor');
       border-radius: 6px;
+      overflow: hidden;
       opacity: 1;
       transition: opacity 0.3s, transform 0.3s;
     }

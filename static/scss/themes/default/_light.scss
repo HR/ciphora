@@ -3,7 +3,8 @@ $lightTheme: (
   
   windowBackgroundColor: #fff,
   contentBackgroundColor: #fff,
-  backgroundColor: #0001,
+  backgroundColor: #ebebeb,
+  transparentBackgroundColor: #0001,
   overlayBackgroundColor: #fffa,
 
   primaryForegroundColor: #000000,
@@ -16,7 +17,7 @@ $lightTheme: (
   sidebarBackgroundColor: #f5f5f5,
   sidebarSelectedItemBackgroundColor: #ebebeb,
 
-  modalBackgroundColor: #fffe,
+  modalBackgroundColor: #fff,
   modalOverlayColor: #1119,
   modalShadowColor: #0003,
   
@@ -24,7 +25,7 @@ $lightTheme: (
   buttonBackgroundColor: #0084ff,
   buttonForegroundColor: #fff,
 
-  dangerBackgroundColor: #dc3545,
-  dangerForegroundColor: #fa3c4c,
+  dangerColor: #dc3545,
+  dangerForegroundColor: #fff,
   onlineColor: #01A452,
 );

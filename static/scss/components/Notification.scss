@@ -37,6 +37,11 @@
   }
 
   .error.notification {
-    background: themed('dangerBackgroundColor');
+    background: themed('dangerColor');
+    color: themed('dangerForegroundColor');
+
+    > .dismiss {
+      color: themed('dangerForegroundColor');
+    }
   }
 }

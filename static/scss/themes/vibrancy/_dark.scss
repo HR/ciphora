@@ -3,7 +3,8 @@ $darkTheme: (
   
   windowBackgroundColor: transparent,
   contentBackgroundColor: #222e,
-  backgroundColor: #222e,
+  backgroundColor: #222,
+  transparentBackgroundColor: #222e,
   overlayBackgroundColor: #5556,
 
   primaryForegroundColor: #fffc,
@@ -24,7 +25,7 @@ $darkTheme: (
   buttonBackgroundColor: #0061E6,
   buttonForegroundColor: #fff,
 
-  dangerBackgroundColor: #dc3545,
-  dangerForegroundColor: #fa3c4c,
+  dangerColor: #dc3545,
+  dangerForegroundColor: #fff,
   onlineColor: #01A452,
 );

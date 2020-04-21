@@ -32,6 +32,7 @@ export default function ImportPGPModal (props) {
             placeholder={pgpExample}
             value={keys}
             onChange={event => setKeys(event.target.value)}
+            rows="6"
           ></textarea>
           <input
             type='password'
