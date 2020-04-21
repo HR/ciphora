@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { basename } from 'path'
 import moment from 'moment'
+import { initialsise } from '../lib/util'
 import { COMPOSE_CHAT_ID, CONTENT_TYPES } from '../../consts'
 
 const timeFormat = {
@@ -10,16 +11,7 @@ const timeFormat = {
   sameElse: 'L'
 }
 
-function initialsise (name) {
-  let iname = name.toUpperCase().split(' ')
-  let initials = name[0]
-  if (iname.length > 1) {
-    initials += iname[iname.length - 1][0]
-  }
-  return initials
-}
-
-export default function ChatListItem (props) {
+export default function Chat (props) {
   const [deleteOpacity, setDeleteOpacity] = useState(0)
   const { name, lastMessage, active } = props
   let content = null

@@ -8,6 +8,7 @@ import {
   ToolbarDropdownItem
 } from './ToolbarButtons'
 import Message from './Message'
+import { classList } from '../lib/util'
 import { CONTENT_TYPES } from '../../consts'
 import moment from 'moment'
 
@@ -181,10 +182,13 @@ export default function MessageList (props) {
     placeholder = 'Add the recipient to start messaging'
   }
 
-  // Render UI
-  var messageListClasses = ['message-list', props.composing ? ' composing' : '']
   return (
-    <div className={messageListClasses.join(' ')}>
+    <div
+      className={classList({
+        'message-list': true,
+        composing: props.composing
+      })}
+    >
       {toolbar}
 
       <div className='message-list-container'>

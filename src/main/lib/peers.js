@@ -64,15 +64,24 @@ module.exports = class Peers extends EventEmitter {
   }
 
   // Connects to given peer
-  connect (receiverId) {
+  connect (userId) {
     // Start connection
-    const signalRequest = (this._requests[receiverId] = {
-      receiverId,
+    const signalRequest = (this._requests[userId] = {
+      receiverId: userId,
       timestamp: new Date().toISOString()
     })
     // Send a signal request to peer
     this._signal.send('signal-request', signalRequest)
-    console.log('Signal request sent')
+    console.log('Connecting with', userId)
+  }
+
+  // Disconnects from given peer
+  remove (userId) {
+    if (!this.isConnected(userId)) return
+    // Destroy connection and delete peer
+    this._peers[userId].destroy()
+    delete this._peers[userId]
+    console.log('Disconnected from', userId)
   }
 
   // Checks if given peer has been added

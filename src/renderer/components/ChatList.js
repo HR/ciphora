@@ -1,5 +1,5 @@
 import React from 'react'
-import ChatListItem from './ChatListItem'
+import Chat from './Chat'
 import Toolbar from './Toolbar'
 import { ToolbarButton } from './ToolbarButtons'
 
@@ -23,7 +23,7 @@ export default function ChatList (props) {
       {/*<ChatSearch />*/}
       {!!props.chats &&
         props.chats.map(chat => (
-          <ChatListItem
+          <Chat
             active={chat.id === props.activeChatId}
             onDeleteClick={() => props.onDeleteClick(chat.id)}
             onClick={() => props.onChatClick(chat.id)}

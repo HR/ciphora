@@ -17,10 +17,23 @@ export function hashCode (string) {
   return h
 }
 
-export function classList(classes) {
-  return Object
-    .entries(classes)
-    .filter(entry => entry[1])
-    .map(entry => entry[0])
-    .join(' ');
+// Returns the initials of a name
+export function initialsise (name) {
+  let iname = name.toUpperCase().split(' ')
+  let initials = name[0]
+  if (iname.length > 1) {
+    initials += iname[iname.length - 1][0]
+  }
+  return initials
+}
+
+// Turns an object into a react clasaName compatible list
+export function classList (classes) {
+  if (!Array.isArray(classes)) {
+    // Turn into an array if not already
+    classes = Object.entries(classes)
+      .filter(entry => entry[1])
+      .map(entry => entry[0])
+  }
+  return classes.join(' ')
 }

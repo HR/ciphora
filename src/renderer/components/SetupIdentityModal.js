@@ -14,9 +14,9 @@ export default function SetupIdentityModal (props) {
       }
       body={
         <React.Fragment>
-          <button onClick={props.onImportPGPClick}>Import PGP key</button>
+          <button onClick={props.onImportIdentityClick}>Import PGP key</button>
           <hr className='divider' />
-          <button onClick={props.onCreatePGPClick}>Create PGP key</button>
+          <button onClick={props.onCreateIdentityClick}>Create PGP key</button>
         </React.Fragment>
       }
       {...props}

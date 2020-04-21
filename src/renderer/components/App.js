@@ -3,8 +3,8 @@ import Messenger from './Messenger'
 import ChatList from './ChatList'
 import MessageList from './MessageList'
 import SetupIdentityModal from './SetupIdentityModal'
-import ImportPGPModal from './ImportPGPModal'
-import CreatePGPModal from './CreatePGPModal'
+import ImportIdentityModal from './ImportIdentityModal'
+import CreateIdentityModal from './CreateIdentityModal'
 import { useNotifications } from '../lib/notifications'
 import { clone, friendlyError } from '../lib/util'
 import { COMPOSE_CHAT_ID, CONTENT_TYPES } from '../../consts'
@@ -17,11 +17,10 @@ let notifications = null
 // Initial modal state used to reset modals
 const initModalsState = {
   setupIdentity: false,
-  importPGP: false,
-  createPGP: false,
+  importIdentity: false,
+  createIdentity: false,
   modalMessage: {
     text: '',
-    longText: '',
     error: false
   }
 }
@@ -53,15 +52,16 @@ export default class App extends React.Component {
     }
 
     // Bindings
-    this.closeModal = this.closeModal.bind(this)
+    this.closeModal = this.closeModals.bind(this)
     this.openModal = this.openModal.bind(this)
-    this.importPGPHandler = this.importPGPHandler.bind(this)
-    this.createPGPHandler = this.createPGPHandler.bind(this)
+    this.importIdentityHandler = this.importIdentityHandler.bind(this)
+    this.createIdentityHandler = this.createIdentityHandler.bind(this)
     this.addChatHandler = this.composeChatHandler.bind(this)
     this.deleteChatHandler = this.deleteChatHandler.bind(this)
     this.activateChat = this.activateChat.bind(this)
     this.composeMessage = this.composeMessage.bind(this)
     this.updateChats = this.updateChats.bind(this)
+    this.showModalMessage = this.showModalMessage.bind(this)
     this.showModalError = this.showModalError.bind(this)
     this.createComposeChat = this.createComposeChat.bind(this)
     this.deleteComposeChat = this.deleteComposeChat.bind(this)
@@ -82,11 +82,27 @@ export default class App extends React.Component {
     ipcRenderer.send('get-chats')
   }
 
+  // Activates the selected chat
+  activateChat (chatId) {
+    // Check if clicked chat already active
+    if (chatId === this.state.activeChatId) {
+      return
+    }
+    // Remove compose chat when user moves to another chat
+    if (this.state.activeChatId === COMPOSE_CHAT_ID) {
+      this.deleteComposeChat()
+    }
+
+    this.setState({ activeChatId: chatId })
+    ipcRenderer.send('activate-chat', chatId)
+  }
+
+  // Updates internal chats thereby updating the UI
   updateChats (event, chats, activeChatId, clearState) {
     let newState = { chats }
     if (clearState) {
       // Reset state
-      this.closeModal()
+      this.closeModals()
       notifications.clear()
       newState.composing = false
     }
@@ -94,12 +110,14 @@ export default class App extends React.Component {
     this.setState(newState)
   }
 
-  closeModal () {
+  // Closes all the modals
+  closeModals () {
     this.setState({
       ...clone(initModalsState)
     })
   }
 
+  // Shows the specified modal
   openModal (name) {
     let newModalState = clone(initModalsState)
     newModalState[name] = true
@@ -107,15 +125,17 @@ export default class App extends React.Component {
   }
 
   showModalError (text) {
+    this.showModalMessage(text, true)
+  }
+
+  showModalMessage (text, error = false) {
     this.setState({
-      modalMessage: {
-        text,
-        error: true
-      }
+      modalMessage: { text, error }
     })
   }
 
-  importPGPHandler (params) {
+  // Handles importing a new PGP key
+  importIdentityHandler (params) {
     const { keys, passphrase } = params
     let pub = keys.match(PUBLIC_KEY_REGEX)
     let priv = keys.match(PRIVATE_KEY_REGEX)
@@ -132,11 +152,12 @@ export default class App extends React.Component {
         publicKeyArmored: pub[0],
         privateKeyArmored: priv[0]
       })
-      .then(() => this.closeModal())
+      .then(() => this.closeModals())
       .catch(error => this.showModalError(friendlyError(error)))
   }
 
-  createPGPHandler (params) {
+  // Handles creating a new PGP key
+  createIdentityHandler (params) {
     // Check if all required params supplied
     if (!params.name || !params.passphrase || !params.algo) {
       this.showModalError('Missing details')
@@ -144,44 +165,15 @@ export default class App extends React.Component {
     }
     // Remove email if not supplied
     if (!params.email) delete params.email
-    this.setState({
-      modalMessage: {
-        text: 'Generating keys...',
-        error: false
-      }
-    })
+    this.showModalMessage('Generating keys...')
 
     ipcRenderer
       .invoke('create-pgp', params)
-      .then(({ publicKeyArmored, privateKeyArmored }) => {
-        // Show generate keys
-        this.setState({
-          modalMessage: {
-            longText: publicKeyArmored + '\n' + privateKeyArmored,
-            text: '',
-            error: false
-          }
-        })
-      })
+      .then(() => this.closeModals())
       .catch(error => this.showModalError(friendlyError(error)))
   }
 
-  createComposeChat () {
-    // Already composing
-    if (this.state.composing) return
-    const id = COMPOSE_CHAT_ID
-    // Create a dummy chat
-    let chats = {}
-    chats[id] = {
-      id,
-      name: 'New Chat',
-      messages: []
-    }
-    // Add to the front
-    chats = { ...chats, ...this.state.chats }
-    this.setState({ composing: true, chats, activeChatId: id })
-  }
-
+  // Handles composing new chats
   composeChatHandler (id) {
     // Validate id
     let [ciphoraId] = id.match(CIPHORA_ID_REGEX) || []
@@ -199,7 +191,24 @@ export default class App extends React.Component {
     ipcRenderer.send('add-chat', ciphoraId, publicKey)
   }
 
-  // Deletes the chat being composed
+  // Creates a new chat placeholder for the chat the user is composing
+  createComposeChat () {
+    // Already composing
+    if (this.state.composing) return
+    const id = COMPOSE_CHAT_ID
+    // Create a dummy chat
+    let chats = {}
+    chats[id] = {
+      id,
+      name: 'New Chat',
+      messages: []
+    }
+    // Add to the front
+    chats = { ...chats, ...this.state.chats }
+    this.setState({ composing: true, chats, activeChatId: id })
+  }
+
+  // Deletes the new chat placeholder
   deleteComposeChat () {
     let { chats } = this.state
     delete chats[COMPOSE_CHAT_ID]
@@ -208,7 +217,7 @@ export default class App extends React.Component {
     this.setState({ composing: false, chats, activeChatId })
   }
 
-  // Handles chat deletion request
+  // Handles chat deletion
   deleteChatHandler (id) {
     if (id === COMPOSE_CHAT_ID) {
       this.deleteComposeChat()
@@ -217,22 +226,7 @@ export default class App extends React.Component {
     ipcRenderer.send('delete-chat', id)
   }
 
-  // Activates the selected chat
-  activateChat (chatId) {
-    // Check if clicked chat already active
-    if (chatId === this.state.activeChatId) {
-      return
-    }
-    // Remove compose chat when user moves to another chat
-    if (this.state.activeChatId === COMPOSE_CHAT_ID) {
-      this.deleteComposeChat()
-    }
-
-    this.setState({ activeChatId: chatId })
-    ipcRenderer.send('activate-chat', chatId)
-  }
-
-  // Handles sending messages
+  // Handles sending a message
   composeMessage (message) {
     // Ensure message is not empty
     if (!message || !WORDS_REGEX.test(message)) return
@@ -245,7 +239,7 @@ export default class App extends React.Component {
     )
   }
 
-  // Handles sending files
+  // Handles sending a file
   async sendFileHandler (type) {
     const title = `Select the ${type} to send`
     // Filter based on type selected
@@ -269,6 +263,7 @@ export default class App extends React.Component {
     )
   }
 
+  // Render the App UI
   render () {
     const activeChat =
       this.state.activeChatId && this.state.chats[this.state.activeChatId]
@@ -276,20 +271,19 @@ export default class App extends React.Component {
       <div className='App'>
         <SetupIdentityModal
           open={this.state.setupIdentity}
-          onImportPGPClick={() => this.openModal('importPGP')}
-          onCreatePGPClick={() => this.openModal('createPGP')}
+          onImportIdentityClick={() => this.openModal('importIdentity')}
+          onCreateIdentityClick={() => this.openModal('createIdentity')}
         />
-        <ImportPGPModal
-          open={this.state.importPGP}
+        <ImportIdentityModal
+          open={this.state.importIdentity}
           onClose={() => this.openModal('setupIdentity')}
-          onImportClick={this.importPGPHandler}
+          onImportClick={this.importIdentityHandler}
           message={this.state.modalMessage}
         />
-        <CreatePGPModal
-          open={this.state.createPGP}
+        <CreateIdentityModal
+          open={this.state.createIdentity}
           onClose={() => this.openModal('setupIdentity')}
-          onCreateClick={this.createPGPHandler}
-          onDoneClick={this.closeModal}
+          onCreateClick={this.createIdentityHandler}
           message={this.state.modalMessage}
         />
         <Messenger

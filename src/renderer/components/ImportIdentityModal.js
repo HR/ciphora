@@ -13,7 +13,7 @@ X4doIG+e00kZncAFqeJcMy3ijjvjKypDGU2j............................
 ..........GQRxAiHPLFsBr1ASV9B688YRyAf9WDJSEwfXG4eEw1/Rt99XBrm1c6
 -----END PGP PRIVATE KEY BLOCK-----`
 
-export default function ImportPGPModal (props) {
+export default function ImportIdentityModal (props) {
   const [keys, setKeys] = useState('')
   const [passphrase, setPassphrase] = useState('')
 

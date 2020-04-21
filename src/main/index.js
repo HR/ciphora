@@ -17,7 +17,6 @@ const { app, Menu, ipcMain, clipboard } = require('electron'),
   State = require('./lib/state'),
   { CONTENT_TYPES } = require('../consts'),
   menu = require('./menu'),
-  ipc = require('./ipc'),
   windows = require('./windows'),
   { DB_PATH } = require('../config')
 
@@ -26,7 +25,6 @@ debug()
 contextMenu()
 
 app.setAppUserModelId(packageJson.build.appId)
-ipc.init()
 let dbPath = DB_PATH
 
 if (!is.development) {
@@ -210,7 +208,11 @@ app.on('activate', windows.main.activate)
   // When user wants to deletes chat
   ipcMain.on('delete-chat', async (event, chatId) => {
     // Delete chat and keys
-    await Promise.all([chats.delete(chatId), crypto.deleteKey(chatId)])
+    await Promise.all([
+      chats.delete(chatId),
+      crypto.deleteKey(chatId),
+      peers.remove(chatId)
+    ])
     // Update UI
     windows.main.send('update-chats', chats.getAll(), chats.getLatestId(), true)
   })

@@ -2,6 +2,7 @@ import React from 'react'
 import { basename } from 'path'
 import moment from 'moment'
 import { CONTENT_TYPES } from '../../consts'
+import { classList } from '../lib/util'
 
 const timeFormat = {
   sameDay: '[Today,] HH:mm',
@@ -62,7 +63,7 @@ export default function Message (props) {
       )
       break
     default:
-      // Render as text
+      // Render as text by default
       contentRender = (
         <div className='bubble' title={friendlyTimestamp}>
           {parseText(content)}
@@ -72,12 +73,12 @@ export default function Message (props) {
 
   return (
     <div
-      className={[
-        'message',
-        `${isMine ? 'mine' : ''}`,
-        `${startsSequence ? 'start' : ''}`,
-        `${endsSequence ? 'end' : ''}`
-      ].join(' ')}
+      className={classList({
+        message: true,
+        mine: isMine,
+        start: startsSequence,
+        end: endsSequence
+      })}
     >
       {showTimestamp && <div className='timestamp'>{friendlyTimestamp}</div>}
 
