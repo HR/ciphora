@@ -11,7 +11,7 @@ const { app, Menu, ipcMain, clipboard } = require('electron'),
   encode = require('encoding-down'),
   packageJson = require('../../package.json'),
   Crypto = require('./lib/Crypto'),
-  Signal = require('./lib/Signal'),
+  Server = require('./lib/Server'),
   Peers = require('./lib/Peers'),
   Chats = require('./lib/Chats'),
   State = require('./lib/State'),
@@ -62,14 +62,14 @@ app.on('activate', windows.main.activate)
   const crypto = new Crypto(db)
   const state = new State(db)
   const chats = new Chats(db)
-  const signal = new Signal()
-  const peers = new Peers(signal, crypto)
+  const server = new Server()
+  const peers = new Peers(server, crypto)
 
   /**
-   * Signal events
+   * Server events
    *****************************/
   // When a new chat request is received from a user
-  signal.on('chat-request', async ({ senderPublicKey: publicKeyArmored }) => {
+  server.on('chat-request', async ({ senderPublicKey: publicKeyArmored }) => {
     console.log('Chat request received')
     // TODO: Check id against block/removed list and add to chats
     const { id, address } = await crypto.getPublicKeyInfoOf(publicKeyArmored)
@@ -80,14 +80,14 @@ app.on('activate', windows.main.activate)
       windows.main.send('update-chats', chats.getAll(), null)
     }
     // Accept chat request by default
-    signal.send('chat-accept', {
+    server.send('chat-accept', {
       senderPublicKey: crypto.getPublicKey(),
       receiverId: id
     })
     console.log('Chat request accepted')
   })
   // When the chat request is accepted from the user
-  signal.on('chat-accept', async ({ senderId, senderPublicKey }) => {
+  server.on('chat-accept', async ({ senderId, senderPublicKey }) => {
     console.log('Chat request accepted')
     const { address } = await crypto.getPublicKeyInfoOf(senderPublicKey)
     // Add chat
@@ -99,7 +99,7 @@ app.on('activate', windows.main.activate)
     peers.connect(senderId)
   })
   // When the user for a new chat request cannot be found
-  signal.on('unknown-receiver', ({ type, receiverId }) => {
+  server.on('unknown-receiver', ({ type, receiverId }) => {
     if (type === 'chat-request') {
       windows.main.send(
         'notify',
@@ -176,7 +176,8 @@ app.on('activate', windows.main.activate)
         message.contentHash = await crypto.hashFile(contentPath)
       }
 
-      peers.sendMessage(message.id, receiverId, message, true, contentPath)
+      // Send the message
+      peers.send(message.id, receiverId, message, true, contentPath)
     }
   )
   // When the user adds a new chat with a new recipient
@@ -199,7 +200,7 @@ app.on('activate', windows.main.activate)
     }
 
     // Send a chat request message to the recipient
-    signal.send('chat-request', {
+    server.send('chat-request', {
       senderPublicKey: crypto.getPublicKey(),
       receiverId: ciphoraId
     })
@@ -272,7 +273,7 @@ app.on('activate', windows.main.activate)
   try {
     // Authenticate with and connect to the signal server
     const authRequest = await crypto.generateAuthRequest()
-    await signal.connect(userId, authRequest)
+    await server.connect(userId, authRequest)
     console.log('Connected to server')
   } catch (error) {
     // Notify user of it

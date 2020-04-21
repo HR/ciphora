@@ -9,11 +9,11 @@ const WebSocket = require('ws'),
   { encode } = require('querystring'),
   { WS_URI } = require('../../config')
 
-module.exports = class Signal extends EventEmitter {
+module.exports = class Server extends EventEmitter {
   constructor () {
     // Ensure singleton
-    if (!!Signal.instance) {
-      return Signal.instance
+    if (!!Server.instance) {
+      return Server.instance
     }
 
     // Call EventEmitter constructor
@@ -27,7 +27,7 @@ module.exports = class Signal extends EventEmitter {
     this._emit = this._emit.bind(this)
     this.send = this.send.bind(this)
 
-    Signal.instance = this
+    Server.instance = this
   }
 
   // Connects to signal server

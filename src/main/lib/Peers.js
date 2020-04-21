@@ -94,10 +94,9 @@ module.exports = class Peers extends EventEmitter {
     return this._peers[id] && this._peers[id].connected
   }
 
-  // Sends a chat message to given peer
-  sendMessage (id, ...args) {
-    // Queue to send
-    this._sendingQueue.add(() => this._send('message', ...args), id)
+  // Queues a chat message to be sent to given peer
+  send (userId, ...args) {
+    this._sendingQueue.add(() => this._send('message', ...args), userId)
   }
 
   // Handles signal requests
