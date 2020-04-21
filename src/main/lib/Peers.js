@@ -13,7 +13,7 @@ const stream = require('stream'),
   wrtc = require('wrtc'),
   moment = require('moment'),
   Peer = require('./simple-peer'),
-  Queue = require('./queue'),
+  Queue = require('./Queue'),
   { CONTENT_TYPES } = require('../../consts'),
   { MEDIA_DIR } = require('../../config'),
   // http://viblast.com/blog/2015/2/5/webrtc-data-channel-message-size/
