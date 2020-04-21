@@ -46,7 +46,6 @@ export default function CreatePGPModal (props) {
         onChange={event => setPassphrase(event.target.value)}
         placeholder='Passphrase'
       ></input>
-      <br />
       <select value={algo} onChange={event => setAlgo(event.target.value)}>
         {PGP_KEY_ALGOS.map(algo => (
           <option key={algo} value={algo}>

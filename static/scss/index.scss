@@ -9,10 +9,11 @@
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
-  background: themed('backgroundColor');
+  background-color: themed('windowBackgroundColor');
 
   .danger {
-    background: themed('dangerBackgroundColor') !important;
+    background: themed('dangerColor') !important;
+    color: themed('dangerForegroundColor') !important;
   }
 
   code {
@@ -22,10 +23,15 @@
 
   * {
     -webkit-appearance: none;
+    user-select: none;
     color: themed('primaryForegroundColor');
   }
 
   *:focus {
     outline: none;
+  }
+
+  a {
+    cursor: pointer;
   }
 }

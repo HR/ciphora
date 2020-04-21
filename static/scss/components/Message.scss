@@ -4,6 +4,18 @@
   .message {
     display: flex;
     flex-direction: column;
+    animation: showMessage 0.3s forwards;
+  }
+
+  @keyframes showMessage {
+    from {
+      transform: translateY(10%);
+      opacity: 0.5;
+    }
+    to {
+      transform: none;
+      opacity: 1;
+    }
   }
 
   .message .timestamp {
@@ -48,7 +60,7 @@
 
   .message .bubble-container .bubble {
     margin: 1px 0px;
-    background: themed('secondaryBackgroundColor');
+    background: themed('backgroundColor');
     padding: 10px 15px;
     border-radius: 20px;
     max-width: 75%;
@@ -60,7 +72,7 @@
 
   .message .bubble-container .bubble.file {
     background: none !important;
-    border: 2px solid themed('secondaryBackgroundColor');
+    border: 2px solid themed('backgroundColor');
     padding: 20px;
     text-align: center;
     width: 130px;
@@ -81,9 +93,11 @@
 
   .message.mine .bubble-container .bubble {
     background: themed('primaryColor');
+    color: themed('primaryColorForegroundColor');
     border-top-left-radius: 20px;
     border-bottom-left-radius: 20px;
     border-top-right-radius: 2px;
     border-bottom-right-radius: 2px;
+    user-select: text;
   }
 }

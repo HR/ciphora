@@ -16,3 +16,11 @@ export function hashCode (string) {
     h = (Math.imul(31, h) + string.charCodeAt(i)) | 0
   return h
 }
+
+export function classList(classes) {
+  return Object
+    .entries(classes)
+    .filter(entry => entry[1])
+    .map(entry => entry[0])
+    .join(' ');
+}

@@ -5,11 +5,11 @@
     display: grid;
     width: 100%;
     height: 100vh;
-    background: themed('secondaryBackgroundColor');
+    background: transparent;
     grid-template-columns: 270px auto;
     grid-template-rows: 60px auto 60px;
-    grid-column-gap: 1px;
-    grid-row-gap: 1px;
+    grid-column-gap: 0;
+    grid-row-gap: 0;
   }
 
   .container {
@@ -26,19 +26,19 @@
   }
 
   .sidebar {
-    background: themed('backgroundColor');
+    background: themed('sidebarBackgroundColor');
     grid-row-start: 1;
     grid-row-end: span 3;
   }
 
   .content {
-    background: themed('backgroundColor');
+    background: themed('contentBackgroundColor');
     grid-row-start: 1;
     grid-row-end: span 3;
   }
 
   .footer {
     grid-column-start: 2;
-    background: themed('backgroundColor');
+    background-color: themed('backgroundColor');
   }
 }

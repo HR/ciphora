@@ -2,7 +2,13 @@
 
 @include themify() {
   .chat-list {
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
+    -webkit-app-region: drag;
+
+    > .toolbar {
+      background-color: transparent;
+    }
   }
 }

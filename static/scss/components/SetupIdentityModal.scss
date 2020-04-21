@@ -1,0 +1,7 @@
+@import '../themes';
+
+@include themify() {
+  .setup-identity-modal .modal-body {
+    text-align: center;
+  }
+}

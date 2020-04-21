@@ -1,31 +1,25 @@
 @import '../themes';
 
 @include themify() {
-  .compose {
-    padding: 6px 15px;
+  .compose-input-area {
+    flex: 1;
     display: flex;
     align-items: center;
-    border-top: 1px solid themed('secondaryBackgroundColor');
-    position: sticky;
-    bottom: 0px;
-    background-color: themed('overlayBackgroundColor');
-    backdrop-filter: blur(20px);
-  }
+    background-color: themed('transparentBackgroundColor');
+    border-radius: 100rem;
 
-  .compose-input {
-    flex: 1;
-    border: none;
-    font-size: 14px;
-    height: 40px;
-    background: none;
-  }
+    .compose-input {
+      flex: 1;
+      padding: 0;
+      border: none;
+      background: none;
+      font-size: 14px;
+      margin: 0.5rem 0.8rem;
+    }
 
-  .compose-input::placeholder {
-    opacity: 0.3;
-  }
-
-  .compose .toolbar-button {
-    margin: 0 10px;
+    .compose-input::placeholder {
+      opacity: 0.8;
+    }
   }
 
   .compose-chat {
@@ -33,19 +27,30 @@
     flex: 1 1 auto;
     display: flex;
     align-items: center;
+
+    .compose-input {
+      background: none;
+    }
+
+    > span {
+      opacity: 0.5;
+      margin: 5px;
+    }
   }
 
-  .compose-chat > span {
-    opacity: 0.5;
-    margin: 5px;
-  }
+  .compose {
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    position: sticky;
+    bottom: 0px;
+    background-color: themed('overlayBackgroundColor');
+    backdrop-filter: blur(20px);
 
-  .compose-chat > .compose-input {
-    height: inherit !important;
-    padding: 5px;
-  }
-
-  .compose-chat > .compose-input::placeholder {
-    font-size: 16px;
+    .toolbar-button {
+      margin-right: 0.8rem;
+      font-size: 1.5rem;
+      color: themed('primaryColor');
+    }
   }
 }

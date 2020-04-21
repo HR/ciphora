@@ -5,10 +5,48 @@
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+
+    > .toolbar {
+      background-color: themed('overlayBackgroundColor');
+      min-height: 53px;
+      -webkit-app-region: drag;
+
+      .toolbar-title {
+        flex: 1;
+      }
+    }
+
+    &.composing {
+      > .toolbar .left-items {
+        flex: 1;
+      }
+    }
   }
 
   .message-list-container {
     flex: 1 1 auto;
     padding: 10px;
+  }
+
+  .userid-area {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: themed('backgroundColor');
+    margin: -0.5rem 0 0.5rem;
+    padding: 0.5rem 1rem;
+
+    span {
+      flex-shrink: 0;
+    }
+
+    .userid-input {
+      flex-grow: 1;
+      margin: 0 0.5rem;
+      border: none;
+      font-size: 14px;
+      background: none;
+    }
   }
 }

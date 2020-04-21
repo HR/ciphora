@@ -2,18 +2,59 @@
 
 @include themify() {
   .toolbar-button {
-    color: themed('primaryColor');
-    font-size: 28px;
-    transition: all 0.1s;
-  }
-
-  .toolbar-button:hover {
+    display: inline-block;
     cursor: pointer;
-    filter: brightness(85%);
+    color: themed('toolbarButtonColor');
+    font-size: 28px;
+    transition: filter 250ms ease-in-out;
+
+    &:hover {
+      filter: brightness(80%);
+    }
+
+    &:active {
+      filter: brightness(60%);
+    }
   }
 
-  .toolbar-button:active {
-    color: themed('primaryColor');
-    opacity: 0.25;
+  .toolbar-dropdown-button {
+    cursor: pointer;
+    position: relative;
+
+    .dropdown-body {
+      z-index: 1000;
+      padding: 0.5rem 0;
+      position: absolute;
+      right: 0;
+      background: themed('modalBackgroundColor');
+      backdrop-filter: blur(20px);
+      border-radius: 6px;
+      overflow: hidden;
+      opacity: 1;
+      transition: opacity 0.3s, transform 0.3s;
+      @include shadow;
+    }
+
+    &:not(.active) .dropdown-body {
+      visibility: collapse;
+      transform: translateY(-20%);
+      opacity: 0;
+    }
+  }
+
+  .toolbar-dropdown-item {
+    padding: 0.5rem 1rem;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color 0.2s, filter 0.2s, color 0.2s;
+
+    &:hover {
+      background-color: themed('primaryColor');
+      color: themed('primaryColorForegroundColor');
+    }
+
+    &:active {
+      filter: brightness(80%);
+    }
   }
 }

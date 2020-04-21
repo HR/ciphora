@@ -1,7 +1,7 @@
 import React from 'react'
 import ChatListItem from './ChatListItem'
 import Toolbar from './Toolbar'
-import ToolbarButton from './ToolbarButton'
+import { ToolbarButton } from './ToolbarButtons'
 
 export default function ChatList (props) {
   // Set to last message there is one otherwise nothing

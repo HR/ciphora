@@ -5,11 +5,13 @@
     display: flex;
     align-items: center;
     padding: 10px;
+    border-bottom: 1px solid themed('highlightBorderColor');
+    transition: background 0.2s;
   }
 
   .chat-list-item:hover,
   .chat-list-item-active {
-    background: themed('secondaryBackgroundColor');
+    background: themed('sidebarSelectedItemBackgroundColor');
     cursor: pointer;
   }
 
@@ -39,7 +41,7 @@
   }
 
   .chat-info-right > .chat-delete:hover {
-    color: themed('dangerBackgroundColor');
+    color: themed('dangerColor');
   }
 
   .chat-time {
@@ -64,7 +66,8 @@
     font-size: 1rem;
     line-height: 50px;
     text-align: center;
-    background: lighten(themed('secondaryBackgroundColor'), 20%);
+    background: lighten(themed('backgroundColor'), 20%);
+    border: 1px solid themed('highlightBorderColor');
     font-weight: bold;
     position: relative;
   }

@@ -1,11 +1,11 @@
 $lightTheme: (
   primaryColor: #0084ff,
   
-  windowBackgroundColor: #fff,
-  contentBackgroundColor: #fff,
-  backgroundColor: #ebebeb,
-  transparentBackgroundColor: #0001,
-  overlayBackgroundColor: #fffa,
+  windowBackgroundColor: transparent,
+  contentBackgroundColor: #fffe,
+  backgroundColor: #fff,
+  transparentBackgroundColor: #fffe,
+  overlayBackgroundColor: #eeea,
 
   primaryForegroundColor: #000000,
   primaryColorForegroundColor: #fff,
@@ -14,10 +14,10 @@ $lightTheme: (
 
   highlightBorderColor: #eee,
 
-  sidebarBackgroundColor: #f5f5f5,
-  sidebarSelectedItemBackgroundColor: #ebebeb,
+  sidebarBackgroundColor: transparent,
+  sidebarSelectedItemBackgroundColor: #fffe,
 
-  modalBackgroundColor: #fff,
+  modalBackgroundColor: #fffe,
   modalOverlayColor: #1119,
   modalShadowColor: #0003,
   
