@@ -8,7 +8,7 @@ import CreateIdentityModal from './CreateIdentityModal'
 import { useNotifications } from '../lib/notifications'
 import { clone, friendlyError } from '../lib/util'
 import { COMPOSE_CHAT_ID, CONTENT_TYPES } from '../../consts'
-import { ipcRenderer, remote, shell } from 'electron'
+import { ipcRenderer, remote, shell, clipboard } from 'electron'
 import '../../../static/scss/index.scss'
 
 const { dialog } = remote
@@ -46,21 +46,22 @@ export default class App extends React.Component {
     super(props)
     this.state = {
       chats: {},
+      profile: {},
       activeChatId: '',
       composing: false,
       ...clone(initModalsState)
     }
 
     // Bindings
-    this.closeModal = this.closeModals.bind(this)
+    this.closeModals = this.closeModals.bind(this)
     this.openModal = this.openModal.bind(this)
     this.importIdentityHandler = this.importIdentityHandler.bind(this)
     this.createIdentityHandler = this.createIdentityHandler.bind(this)
-    this.addChatHandler = this.composeChatHandler.bind(this)
+    this.composeChatHandler = this.composeChatHandler.bind(this)
     this.deleteChatHandler = this.deleteChatHandler.bind(this)
     this.activateChat = this.activateChat.bind(this)
-    this.composeMessage = this.composeMessage.bind(this)
-    this.updateChats = this.updateChats.bind(this)
+    this.composeMessageHandler = this.composeMessageHandler.bind(this)
+    this.updateState = this.updateState.bind(this)
     this.showModalMessage = this.showModalMessage.bind(this)
     this.showModalError = this.showModalError.bind(this)
     this.createComposeChat = this.createComposeChat.bind(this)
@@ -71,7 +72,7 @@ export default class App extends React.Component {
     ipcRenderer.on('log', (event, data) => console.log(data))
     ipcRenderer.on('open-modal', (event, modal) => this.openModal(modal))
     ipcRenderer.on('modal-error', (event, err) => this.showModalError(err))
-    ipcRenderer.on('update-chats', this.updateChats)
+    ipcRenderer.on('update-state', this.updateState)
   }
 
   componentDidMount () {
@@ -79,7 +80,7 @@ export default class App extends React.Component {
     notifications = this.context
     // Let main process show notifications
     ipcRenderer.on('notify', (event, ...args) => notifications.show(...args))
-    ipcRenderer.send('get-chats')
+    ipcRenderer.send('do-update-state')
   }
 
   // Activates the selected chat
@@ -97,16 +98,15 @@ export default class App extends React.Component {
     ipcRenderer.send('activate-chat', chatId)
   }
 
-  // Updates internal chats thereby updating the UI
-  updateChats (event, chats, activeChatId, clearState) {
-    let newState = { chats }
-    if (clearState) {
+  // Updates internal state thereby updating the UI
+  updateState (event, state, resetState) {
+    let newState = { ...state }
+    if (resetState) {
       // Reset state
       this.closeModals()
       notifications.clear()
       newState.composing = false
     }
-    if (activeChatId) newState = { activeChatId, ...newState }
     this.setState(newState)
   }
 
@@ -227,7 +227,7 @@ export default class App extends React.Component {
   }
 
   // Handles sending a message
-  composeMessage (message) {
+  composeMessageHandler (message) {
     // Ensure message is not empty
     if (!message || !WORDS_REGEX.test(message)) return
 
@@ -289,11 +289,14 @@ export default class App extends React.Component {
         <Messenger
           sidebar={
             <ChatList
+              profile={this.state.profile}
               chats={Object.values(this.state.chats)}
               activeChatId={this.state.activeChatId}
               onChatClick={this.activateChat}
               onComposeChatClick={this.createComposeChat}
               onDeleteClick={this.deleteChatHandler}
+              onCopyIdClick={() => clipboard.writeText(this.state.profile.id)}
+              onCopyPGPClick={() => ipcRenderer.send('copy-pgp')}
             />
           }
           content={
@@ -302,11 +305,15 @@ export default class App extends React.Component {
               onComposeChat={this.composeChatHandler}
               activeChatId={this.state.activeChatId}
               chat={activeChat}
-              onComposeMessage={this.composeMessage}
+              onComposeMessage={this.composeMessageHandler}
               onSendFileClick={this.sendFileHandler}
               onFileClick={filePath => shell.openItem(filePath)}
               onLinkClick={url => shell.openExternal(url)}
-              onDeleteChat={this.deleteChatHandler}
+              onDeleteClick={this.deleteChatHandler}
+              onCopyIdClick={() => clipboard.writeText(this.state.activeChatId)}
+              onCopyPGPClick={() =>
+                ipcRenderer.send('copy-pgp', this.state.activeChatId)
+              }
             />
           }
         />

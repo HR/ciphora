@@ -1,5 +1,9 @@
 import React from 'react'
 
+export function ToolbarButton (props) {
+  return <i className={`toolbar-button ${props.icon}`} {...props} />
+}
+
 export default function Toolbar (props) {
   const { title, leftItems, rightItems } = props
   return (

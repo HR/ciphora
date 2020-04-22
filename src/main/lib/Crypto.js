@@ -68,10 +68,10 @@ module.exports = class Crypto {
       // Get the PGP private key passphrase from the OS's keychain
       const passphrase = await keytar.getPassword(
         SERVICE,
-        this._armoredSelfKey.id
+        this._armoredSelfKey.user.id
       )
       if (!passphrase) return false
-      this._initKey(passphrase)
+      await this._initKey(passphrase)
       console.log('Loaded self keys')
       return true
     } catch (err) {
@@ -82,20 +82,25 @@ module.exports = class Crypto {
   }
 
   // Waits until own PGP key has been generated/imported if no own PGP key
-  async hasKey () {
+  async whenReady () {
     await waitUntil(() => !isEmpty(this._selfKey))
   }
 
-  // Gets own user id (PGP Public Key fingerprint)
-  // Fingerprint space is 16^40 (hex), sufficiently large enough for userId
-  // (birthday paradox: num of keys to have 50% chance of collision is ~√2^160)
-  getId () {
-    return this._armoredSelfKey.id
+  // Gets own user info
+  getUserInfo () {
+    return this._armoredSelfKey.user
   }
 
   // Gets own PGP public key
   getPublicKey () {
     return this._armoredSelfKey.publicKeyArmored
+  }
+
+  // Gets own PGP key info (id, name,...)
+  getPublicKeyInfo () {
+    const { id } = this._armoredSelfKey
+    const address = parseAddress(this._selfKey.publicKey.getUserIds())
+    return { id, ...address }
   }
 
   // Gets chat PGP public key
@@ -172,7 +177,6 @@ module.exports = class Crypto {
       await this._initKey(passphrase)
       await this._saveKey(passphrase)
       console.log('Generated self key')
-      return this._armoredSelfKey
     } catch (err) {
       return err
     }
@@ -217,7 +221,7 @@ module.exports = class Crypto {
   async _saveKey (passphrase) {
     // Save the PGP passphrase for the private in the OS's keychain
     // Use user id as account name
-    await keytar.setPassword(SERVICE, this._armoredSelfKey.id, passphrase)
+    await keytar.setPassword(SERVICE, this._armoredSelfKey.user.id, passphrase)
     // Save in store
     await this._store.put(SELFKEY_DB_KEY, this._armoredSelfKey)
     console.log('Saved self keys')
@@ -231,7 +235,7 @@ module.exports = class Crypto {
 
   // Initialises own PGP key and decrypts its private key
   async _initKey (passphrase) {
-    const { publicKeyArmored, privateKeyArmored, id } = this._armoredSelfKey
+    const { publicKeyArmored, privateKeyArmored, user } = this._armoredSelfKey
     const {
       keys: [publicKey]
     } = await pgp.key.readArmored(publicKeyArmored)
@@ -240,8 +244,14 @@ module.exports = class Crypto {
     } = await pgp.key.readArmored(privateKeyArmored)
 
     await privateKey.decrypt(passphrase)
-    // Set id as public key fingerprint if not already set
-    if (!id) this._armoredSelfKey.id = publicKey.getFingerprint()
+    // Set user info if not already set
+    if (!user) {
+      this._armoredSelfKey.user = {
+        id: publicKey.getFingerprint(),
+        ...parseAddress(publicKey.getUserIds())
+      }
+    }
+    // Init key
     this._selfKey = {
       publicKey,
       privateKey

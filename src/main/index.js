@@ -57,7 +57,7 @@ app.on('activate', windows.main.activate)
   await app.whenReady()
   Menu.setApplicationMenu(menu)
 
-  let userId
+  let profile
   const db = await levelup(encode(leveldown(dbPath), { valueEncoding: 'json' }))
   const crypto = new Crypto(db)
   const state = new State(db)
@@ -77,7 +77,7 @@ app.on('activate', windows.main.activate)
       // Add chat if not already added
       await chats.add(id, publicKeyArmored, address)
       await crypto.addKey(id, publicKeyArmored)
-      windows.main.send('update-chats', chats.getAll(), null)
+      windows.main.send('update-state', { chats: chats.getAll() })
     }
     // Accept chat request by default
     server.send('chat-accept', {
@@ -94,7 +94,11 @@ app.on('activate', windows.main.activate)
     await chats.add(senderId, senderPublicKey, address)
     await crypto.addKey(senderId, senderPublicKey)
     // Update UI
-    windows.main.send('update-chats', chats.getAll(), senderId, true)
+    windows.main.send(
+      'update-state',
+      { chats: chats.getAll(), activeChatId: senderId },
+      true
+    )
     // Establish a connection
     peers.connect(senderId)
   })
@@ -120,14 +124,14 @@ app.on('activate', windows.main.activate)
     // Set user as online
     chats.setOnline(userId)
     // Update UI
-    windows.main.send('update-chats', chats.getAll())
+    windows.main.send('update-state', { chats: chats.getAll() })
   })
   // When a connection with a user is closed
   peers.on('disconnect', async userId => {
     console.log('Disconnected with', userId)
     chats.setOffline(userId)
     // Update UI
-    windows.main.send('update-chats', chats.getAll())
+    windows.main.send('update-state', { chats: chats.getAll() })
   })
   // When a connection error with a user occurs
   peers.on('error', (userId, err) => {
@@ -138,7 +142,7 @@ app.on('activate', windows.main.activate)
   peers.on('message', async (senderId, message) => {
     console.log('Got message', message)
     chats.addMessage(senderId, message)
-    windows.main.send('update-chats', chats.getAll())
+    windows.main.send('update-state', { chats: chats.getAll() })
   })
 
   /**
@@ -151,7 +155,7 @@ app.on('activate', windows.main.activate)
       // Construct message
       let contentPath
       let message = {
-        sender: userId,
+        sender: profile.id,
         content,
         contentType, // mime-type of message
         timestamp: new Date().toISOString()
@@ -163,7 +167,7 @@ app.on('activate', windows.main.activate)
       // TODO: Copy media to media dir
       chats.addMessage(receiverId, { ...message })
       // Optimistically update UI
-      windows.main.send('update-chats', chats.getAll())
+      windows.main.send('update-state', { chats: chats.getAll() })
 
       if (
         contentType === CONTENT_TYPES.IMAGE ||
@@ -194,7 +198,7 @@ app.on('activate', windows.main.activate)
     // Normalise id
     ciphoraId = ciphoraId.toLowerCase()
     // Ensure it hasn't been already added or is own
-    if (chats.has(ciphoraId) || ciphoraId === userId) {
+    if (chats.has(ciphoraId) || ciphoraId === profile.id) {
       windows.main.send('notify', 'Already added', null, true, 4000)
       return
     }
@@ -215,16 +219,22 @@ app.on('activate', windows.main.activate)
       peers.remove(chatId)
     ])
     // Update UI
-    windows.main.send('update-chats', chats.getAll(), chats.getLatestId(), true)
+    windows.main.send(
+      'update-state',
+      { chats: chats.getAll(), activeChatId: chats.getLatestId() },
+      true
+    )
   })
-  // When user wants to copy a user ID
-  ipcMain.on('copy-user-id', async (event, userId) =>
-    clipboard.writeText(userId)
-  )
-  // When user wants to copy a chat PGP key
-  ipcMain.on('copy-pgp', async (event, chatId) =>
-    clipboard.writeText(crypto.getChatPublicKey(chatId))
-  )
+  // When user wants to copy a PGP key
+  ipcMain.on('copy-pgp', async (event, chatId) => {
+    if (chatId) {
+      // Copy PGP of given userId
+      clipboard.writeText(crypto.getChatPublicKey(chatId))
+      return
+    }
+    // Otherwise, copy own PGP key
+    clipboard.writeText(crypto.getKey().join('\n'))
+  })
   // When user selects a chat
   ipcMain.handle('activate-chat', async (event, chatId) =>
     state.set('lastActiveChat', chatId)
@@ -254,26 +264,36 @@ app.on('activate', windows.main.activate)
     // Launch PGP key setup
     windows.main.send('open-modal', 'setupIdentity')
     // Wait until setup is complete i.e. PGP key has been generated/imported
-    await crypto.hasKey()
+    await crypto.whenReady()
   }
 
-  userId = crypto.getId()
+  // Get the profile
+  profile = crypto.getUserInfo()
+  console.log(profile)
+
   // Get last active chat
-  const lastActiveChat = state.get('lastActiveChat', chats.getLatestId())
-  // Populate UI with chats
-  windows.main.send('update-chats', chats.getAll(), lastActiveChat)
+  const activeChatId = state.get('lastActiveChat', chats.getLatestId() || '')
+  // Populate UI
+  windows.main.send('update-state', {
+    chats: chats.getAll(),
+    activeChatId,
+    profile
+  })
+  ipcMain.on('do-update-state', async event =>
+    windows.main.send('update-state', {
+      chats: chats.getAll(),
+      activeChatId,
+      profile
+    })
+  )
 
   // TODO: remove this (debug)
-  console.log('------> CiphoraId', userId)
-  windows.main.send('log', userId)
-  ipcMain.on('get-chats', async event =>
-    windows.main.send('update-chats', chats.getAll(), lastActiveChat)
-  )
+  console.log('------> CiphoraId', profile.id)
 
   try {
     // Authenticate with and connect to the signal server
     const authRequest = await crypto.generateAuthRequest()
-    await server.connect(userId, authRequest)
+    await server.connect(profile.id, authRequest)
     console.log('Connected to server')
   } catch (error) {
     // Notify user of it

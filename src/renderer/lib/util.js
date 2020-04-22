@@ -37,3 +37,8 @@ export function classList (classes) {
   }
   return classes.join(' ')
 }
+
+// Checks if an object is empty
+export function isEmpty (obj) {
+  return Object.keys(obj).length === 0 && obj.constructor === Object
+}

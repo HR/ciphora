@@ -39,9 +39,9 @@ module.exports = class State {
   }
 
   // Sets a state value
-  set (key, value) {
+  async set (key, value) {
     this._state[key] = value
-    this._saveState()
+    await this._saveState()
   }
 
   // Gets a state value, otherwise returns default

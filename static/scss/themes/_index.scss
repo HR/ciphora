@@ -26,3 +26,5 @@
 @function to-string($value) {
   @return inspect($value);
 }
+
+$horizontal-spacing: 0.8rem;

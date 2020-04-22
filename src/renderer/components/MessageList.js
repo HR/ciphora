@@ -1,12 +1,11 @@
-import { ipcRenderer } from 'electron'
 import React, { useEffect, useState, useRef } from 'react'
 import Compose from './Compose'
-import Toolbar from './Toolbar'
+import Toolbar, { ToolbarButton } from './Toolbar'
 import {
-  ToolbarButton,
   ToolbarDropdownButton,
-  ToolbarDropdownItem
-} from './ToolbarButtons'
+  ToolbarDropdownItem,
+  ToolbarDropdownUserInfo
+} from './ToolbarDropdown'
 import Message from './Message'
 import { classList } from '../lib/util'
 import { CONTENT_TYPES } from '../../consts'
@@ -15,7 +14,7 @@ import moment from 'moment'
 export default function MessageList (props) {
   const [message, setMessage] = useState('')
   const [id, setId] = useState('')
-  const [infoDropdownActive, setInfoDropdownActive] = useState(false)
+
   const messagesEndRef = useRef(null)
 
   // Scrolls to the bottom
@@ -25,24 +24,6 @@ export default function MessageList (props) {
 
   // Scroll to the bottom everytime a new message is sent/received to show it
   useEffect(scrollToBottom, [props.chat])
-
-  // Handles copy User ID to clipboard request
-  function onCopyUserIdClick () {
-    setInfoDropdownActive(false)
-    ipcRenderer.send('copy-user-id', props.chat.id.toUpperCase())
-  }
-
-  // Handles copy PGP key to clipboard request
-  function onCopyPGPClick () {
-    setInfoDropdownActive(false)
-    ipcRenderer.send('copy-pgp', props.activeChatId)
-  }
-
-  // Handles copy PGP key to clipboard request
-  function onDeleteChatClick () {
-    setInfoDropdownActive(false)
-    props.onDeleteChat(props.chat.id)
-  }
 
   // Invokes the passed function (fn) when enter press detected
   function onEnterPress (fn) {
@@ -123,25 +104,18 @@ export default function MessageList (props) {
           <ToolbarDropdownButton
             key='info'
             icon='ion-ios-information-circle-outline'
-            active={infoDropdownActive}
-            setActive={setInfoDropdownActive}
           >
-            <div className='userid-area'>
-              <span>User ID:</span>
-              <input
-                className='userid-input'
-                type='text'
-                readOnly
-                value={props.chat.id.toUpperCase()}
-              />
-            </div>
-            <ToolbarDropdownItem onClick={onCopyUserIdClick}>
+            <ToolbarDropdownUserInfo
+              name={props.chat.name}
+              id={props.chat.id}
+            />
+            <ToolbarDropdownItem onClick={props.onCopyIdClick}>
               Copy User ID
             </ToolbarDropdownItem>
-            <ToolbarDropdownItem onClick={onCopyPGPClick}>
+            <ToolbarDropdownItem onClick={props.onCopyPGPClick}>
               Copy PGP Key
             </ToolbarDropdownItem>
-            <ToolbarDropdownItem onClick={onDeleteChatClick}>
+            <ToolbarDropdownItem onClick={props.onDeleteClick}>
               Delete Chat
             </ToolbarDropdownItem>
           </ToolbarDropdownButton>

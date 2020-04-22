@@ -5,16 +5,16 @@
     flex: 1;
     display: flex;
     align-items: center;
-    background-color: themed('transparentBackgroundColor');
-    border-radius: 100rem;
 
     .compose-input {
       flex: 1;
-      padding: 0;
       border: none;
       background: none;
       font-size: 14px;
-      margin: 0.5rem 0.8rem;
+      padding: 0.5rem 0.8rem;
+      margin: 0rem;
+      background-color: themed('transparentBackgroundColor');
+      border-radius: 100rem;
     }
 
     .compose-input::placeholder {
@@ -39,7 +39,7 @@
   }
 
   .compose {
-    padding: 0.5rem;
+    padding: 0.5rem $horizontal-spacing;
     display: flex;
     align-items: center;
     position: sticky;
@@ -48,9 +48,17 @@
     backdrop-filter: blur(20px);
 
     .toolbar-button {
-      margin-right: 0.8rem;
+      margin-right: $horizontal-spacing;
       font-size: 1.5rem;
       color: themed('primaryColor');
+    }
+
+    .toolbar-button:first-child {
+      margin-left: $horizontal-spacing;
+    }
+
+    .toolbar-button:last-child {
+      margin-right: 0rem;
     }
   }
 }
