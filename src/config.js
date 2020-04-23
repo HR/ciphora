@@ -20,7 +20,7 @@ const CONFIG_DEV = {
   ...CONFIG,
   LOAD_URL: 'http://localhost:9000',
   WS_URI: 'ws://localhost:7000',
-  MAIN_WIN_WIDTH: 1200,
+  MAIN_WIN_WIDTH: 875,
   MAIN_WIN_HEIGHT: 500
 }
 

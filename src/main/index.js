@@ -23,7 +23,7 @@ const { app, Menu, ipcMain, clipboard } = require('electron'),
   { DB_PATH } = require('../config')
 
 unhandled()
-debug()
+// debug()
 contextMenu()
 
 app.setAppUserModelId(packageJson.build.appId)

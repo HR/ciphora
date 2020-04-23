@@ -69,7 +69,6 @@ export default class App extends React.Component {
     this.sendFileHandler = this.sendFileHandler.bind(this)
 
     // Add event listeners
-    ipcRenderer.on('log', (event, data) => console.log(data))
     ipcRenderer.on('open-modal', (event, modal) => this.openModal(modal))
     ipcRenderer.on('modal-error', (event, err) => this.showModalError(err))
     ipcRenderer.on('update-state', this.updateState)
@@ -80,6 +79,7 @@ export default class App extends React.Component {
     notifications = this.context
     // Let main process show notifications
     ipcRenderer.on('notify', (event, ...args) => notifications.show(...args))
+    // Load state from main if not already loaded
     ipcRenderer.send('do-update-state')
   }
 
@@ -186,6 +186,7 @@ export default class App extends React.Component {
     }
 
     // TODO: replace with progress bar under compose
+    // Show persistent composing notification
     notifications.show('Composing chat...', null, false)
 
     ipcRenderer.send('add-chat', ciphoraId, publicKey)

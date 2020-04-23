@@ -1,6 +1,6 @@
 'use strict'
 const path = require('path')
-const { app, Menu, shell } = require('electron')
+const { app, webContents, Menu, shell } = require('electron')
 const {
   is,
   appMenu,
@@ -57,6 +57,15 @@ if (!is.macos) {
 
 const debugSubmenu = [
   {
+    label: 'Toggle theme',
+    click () {
+      webContents.getFocusedWebContents().send('toggle-theme')
+    }
+  },
+  {
+    type: 'separator'
+  },
+  {
     label: 'Show App Data',
     click () {
       shell.openItem(app.getPath('userData'))
@@ -96,9 +105,7 @@ const macosTemplate = [
     submenu: [
       {
         label: 'New Message',
-        click () {
-          showPreferences()
-        }
+        click () {}
       },
       {
         type: 'separator'
