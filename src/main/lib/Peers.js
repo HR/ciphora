@@ -23,7 +23,7 @@ const { mkdir } = fs.promises
 const pipeline = util.promisify(stream.pipeline)
 
 module.exports = class Peers extends EventEmitter {
-  constructor (signal, crypto) {
+  constructor (signal, crypto, chats) {
     // Ensure singleton
     if (!!Peers.instance) {
       return Peers.instance
@@ -36,6 +36,7 @@ module.exports = class Peers extends EventEmitter {
     this._requests = {}
     this._signal = signal
     this._crypto = crypto
+    this._chats = chats
     this._sendingQueue = new Queue()
     this._receivingQueue = new Queue()
 
@@ -76,11 +77,8 @@ module.exports = class Peers extends EventEmitter {
   }
 
   // Disconnects from given peer
-  remove (userId) {
-    if (!this.isConnected(userId)) return
-    // Destroy connection and delete peer
-    this._peers[userId].destroy()
-    delete this._peers[userId]
+  disconnect (userId) {
+    this._removePeer(userId)
     console.log('Disconnected from', userId)
   }
 
@@ -102,7 +100,9 @@ module.exports = class Peers extends EventEmitter {
   // Handles signal requests
   _onSignalRequest ({ senderId, timestamp }) {
     console.log('Signal request received')
-    // TODO: Check added if in added chats (subscribe to its list using RxJS?)
+    // Ensure chat exists with signal sender
+    if (!this._chats.has(senderId)) return console.log('Rejected as no chat')
+
     const request = this._requests[senderId]
     // If a request to the sender has not already been sent then just accept it
     // Add receiver to receive signal

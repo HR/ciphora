@@ -11,6 +11,7 @@ const { app, BrowserWindow } = require('electron'),
   { waitUntil } = require('../lib/util'),
   { LOAD_URL, MAIN_WIN_WIDTH, MAIN_WIN_HEIGHT } = require('../../config')
 
+// Create and initializes a new main window
 async function init () {
   let isWindowReady = false
   const win = (main.win = new BrowserWindow({
@@ -26,7 +27,7 @@ async function init () {
     titleBarStyle: 'hiddenInset',
     webPreferences: {
       nodeIntegration: true,
-      webSecurity: false
+      webSecurity: false // To allow local image loading
     }
   }))
 
@@ -41,16 +42,16 @@ async function init () {
     main.win = undefined
   })
 
-  console.log(LOAD_URL)
-
   await win.loadURL(LOAD_URL)
   // Wait until window has loaded
   await waitUntil(() => isWindowReady, 6000)
   return win
 }
 
+// Handles second instance of window
 function secondInstance () {
   if (main.win) {
+    // Show existing window if it already exists
     if (main.win.isMinimized()) {
       main.win.restore()
     }
@@ -59,12 +60,15 @@ function secondInstance () {
   }
 }
 
+// Activates the window
 function activate () {
   if (!main.win) {
+    // Create the main window if it doesn't exist already
     main.win = init()
   }
 }
 
+// Sends an IPC message to the renderer (the window)
 function send (channel, ...args) {
   if (main.win) {
     main.win.webContents.send(channel, ...args)

@@ -95,7 +95,7 @@ module.exports = class Chats {
 
   // Set a chat as offline
   setOffline (id) {
-    return (this._chats[id].online = false)
+    return this.has(id) && (this._chats[id].online = false)
   }
 
   // Saves chats to the store
