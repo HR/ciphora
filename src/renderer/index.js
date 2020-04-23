@@ -20,11 +20,19 @@ function setTheme () {
   }
 }
 
-// When user toggles the theme
-ipcRenderer.on('toggle-theme', event => {
+// Switches the UI theme between light and dark
+function switchTheme () {
   isDarkMode = !isDarkMode
   setTheme()
-})
+}
+
+// Add a shortcut to switch themes
+window.onkeyup = function (e) {
+  // ctrl + t
+  if (e.ctrlKey && e.key === 't') {
+    switchTheme()
+  }
+}
 
 // Set theme accordingly
 setTheme()

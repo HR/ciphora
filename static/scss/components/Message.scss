@@ -73,6 +73,7 @@
   .message .bubble-container .bubble.file {
     background: none !important;
     border: 2px solid themed('backgroundColor');
+    color: themed('primaryForegroundColor') !important;
     padding: 20px;
     text-align: center;
     width: 130px;

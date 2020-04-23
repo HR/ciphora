@@ -1,6 +1,6 @@
 'use strict'
 const path = require('path')
-const { app, webContents, Menu, shell } = require('electron')
+const { app, Menu, shell } = require('electron')
 const {
   is,
   appMenu,
@@ -56,15 +56,6 @@ if (!is.macos) {
 }
 
 const debugSubmenu = [
-  {
-    label: 'Toggle theme',
-    click () {
-      webContents.getFocusedWebContents().send('toggle-theme')
-    }
-  },
-  {
-    type: 'separator'
-  },
   {
     label: 'Show App Data',
     click () {
