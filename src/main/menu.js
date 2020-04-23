@@ -9,7 +9,6 @@ const {
   openNewGitHubIssue,
   debugInfo
 } = require('electron-util')
-const config = require('../config')
 
 const showPreferences = () => {
   // Show the app's preferences here
@@ -58,12 +57,6 @@ if (!is.macos) {
 
 const debugSubmenu = [
   {
-    label: 'Show Settings',
-    click () {
-      config.openInEditor()
-    }
-  },
-  {
     label: 'Show App Data',
     click () {
       shell.openItem(app.getPath('userData'))
@@ -73,11 +66,9 @@ const debugSubmenu = [
     type: 'separator'
   },
   {
-    label: 'Delete Settings',
+    label: 'Delete Chat Messages',
     click () {
-      config.clear()
-      app.relaunch()
-      app.quit()
+      app.emit('delete-messages')
     }
   },
   {
@@ -104,7 +95,10 @@ const macosTemplate = [
     role: 'fileMenu',
     submenu: [
       {
-        label: 'Custom'
+        label: 'New Message',
+        click () {
+          showPreferences()
+        }
       },
       {
         type: 'separator'

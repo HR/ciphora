@@ -72,20 +72,20 @@ module.exports = class Chats {
       ...address,
       messages: []
     }
-    await this._saveChats()
+    await this._saveAll()
   }
 
   // Deletes a chat
   async delete (id) {
     delete this._chats[id]
-    await this._saveChats()
+    await this._saveAll()
     console.log('Deleted chat', id)
   }
 
   // Adds a message
   addMessage (id, message) {
     this._chats[id].messages.push(message)
-    // this._saveChats()
+    this._saveAll()
   }
 
   // Set a chat as online
@@ -98,8 +98,17 @@ module.exports = class Chats {
     return this.has(id) && (this._chats[id].online = false)
   }
 
+  // Deletes all the chat messages
+  async deleteAllMessages () {
+    for (const chat in this._chats) {
+      if (!this._chats.hasOwnProperty(chat)) continue
+      this._chats[chat].messages = []
+    }
+    await this._saveAll()
+  }
+
   // Saves chats to the store
-  async _saveChats () {
+  async _saveAll () {
     await this._store.put(CHATS_DB_KEY, this._chats)
     console.log('Saved chats')
   }

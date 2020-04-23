@@ -71,6 +71,11 @@ app.on('activate', windows.main.activate)
   const peers = new Peers(server, crypto, chats)
 
   /**
+   * App events
+   *****************************/
+  app.on('delete-messages', deleteMessagesHandler)
+
+  /**
    * Server events
    *****************************/
   // When a new chat request is received from a user
@@ -179,6 +184,12 @@ app.on('activate', windows.main.activate)
   /**
    * Handlers
    *****************************/
+  /* App handlers */
+  async function deleteMessagesHandler () {
+    await chats.deleteAllMessages()
+    windows.main.send('update-state', { chats: chats.getAll() })
+  }
+
   /* Server handlers */
   async function chatRequestHandler ({ senderPublicKey: publicKeyArmored }) {
     console.log('Chat request received')
