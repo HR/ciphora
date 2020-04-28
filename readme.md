@@ -32,7 +32,6 @@ has to be verified manually in-person.
     <img src=".github/messenger.png" width="846">
   </a>
 </p>
-<br>
 <p align="center">
   <a href="https://github.com/HR/ciphora/releases/latest">
     <img src=".github/messenger_dark.png" width="846">
@@ -48,6 +47,8 @@ has to be verified manually in-person.
 - [ ] Offline messaging
 - [ ] Local encryption
 
+You are welcome to open pull requests to help implement the features still to
+do!
 
 ## Install
 
