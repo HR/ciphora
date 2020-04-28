@@ -26,6 +26,29 @@ need for in-person verification like with other E2E encryption apps (WhatsApp,
 Signal,...) where identity keypairs are generated on a per-device basis and each
 has to be verified manually in-person.
 
+<br>
+<p align="center">
+  <a href="https://github.com/HR/ciphora/releases/latest">
+    <img src=".github/messenger.png" width="846">
+  </a>
+</p>
+<br>
+<p align="center">
+  <a href="https://github.com/HR/ciphora/releases/latest">
+    <img src=".github/messenger_dark.png" width="846">
+  </a>
+</p>
+
+## Features
+- [x] End-to-end encrypted messaging
+- [x] Peer-to-peer messaging
+- [x] Sending images
+- [x] Sending files
+- [x] Dark Mode
+- [ ] Offline messaging
+- [ ] Local encryption
+
+
 ## Install
 
 _macOS 10.10+, Linux, and Windows 7+ are supported (64-bit only)._
@@ -44,7 +67,6 @@ _The AppImage needs to be [made executable](http://discourse.appimage.org/t/how-
 
 [**Download**](https://github.com/hr/ciphora/releases/latest) the `.exe` file.
 
----
 
 ## Dev
 
