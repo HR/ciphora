@@ -89,7 +89,7 @@ module.exports = class Peers extends EventEmitter {
 
   // Checks if given peer is connected
   isConnected (id) {
-    return this._peers[id] && this._peers[id].connected
+    return this._peers[id] && this._peers[id]._isConnected
   }
 
   // Queues a chat message to be sent to given peer
@@ -183,7 +183,7 @@ module.exports = class Peers extends EventEmitter {
       reconnectTimer: 1000
     }))
     const type = initiator ? 'Sender' : 'Receiver'
-    peer.connected = false
+    peer._isConnected = false
 
     peer.on('signal', data => {
       // Trickle signal data to the peer
@@ -195,7 +195,7 @@ module.exports = class Peers extends EventEmitter {
     })
 
     peer.on('connect', async () => {
-      peer.connected = true
+      peer._isConnected = true
       // Initialises a chat session
       const keyMessage = await this._crypto.initSession(userId)
       // Send the master secret public key with signature to the user
@@ -205,7 +205,7 @@ module.exports = class Peers extends EventEmitter {
     })
 
     peer.on('close', () => {
-      peer.connected = false
+      peer._isConnected = false
       this.emit('disconnect', userId)
     })
 
