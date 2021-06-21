@@ -26,8 +26,11 @@ async function init () {
     // vibrancy: 'appearance-based',
     titleBarStyle: 'hiddenInset',
     webPreferences: {
+      enableRemoteModule: true,
       nodeIntegration: true,
-      webSecurity: false // To allow local image loading
+      contextIsolation: false,
+      webSecurity: false, // To allow local image loading
+      allowRunningInsecureContent: true
     }
   }))
 

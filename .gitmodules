@@ -1,3 +1,4 @@
 [submodule "src/main/lib/simple-peer"]
 	path = src/main/lib/simple-peer
-	url = https://github.com/feross/simple-peer
+	url = https://github.com/t-mullen/simple-peer
+	branch = datachannel2
